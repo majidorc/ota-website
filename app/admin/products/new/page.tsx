@@ -25,6 +25,7 @@ export default function NewProduct() {
         <div className="flex items-center mb-8">
           <div className={`flex-1 h-1 rounded ${step >= 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
           <div className={`flex-1 h-1 rounded mx-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+          <div className={`flex-1 h-1 rounded ${step >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
         </div>
         {/* Step 1: Language */}
         {step === 1 && (
@@ -95,7 +96,29 @@ export default function NewProduct() {
               <button
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
                 disabled={!category}
-                onClick={() => {/* Next step logic here */}}
+                onClick={() => setStep(3)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 3: Placeholder */}
+        {step === 3 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">3</span>
+              <span className="font-semibold">Automated content creator (Coming soon)</span>
+            </div>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700 text-sm mb-4">
+              This is a placeholder for the next step. The full step will be implemented next.
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(2)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled
               >Continue</button>
             </div>
           </div>
