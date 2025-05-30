@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -16,9 +17,9 @@ const statusColors: Record<string, string> = {
 };
 
 const menuTabs = [
-  { name: "Create", dropdown: ["New Product"] },
-  { name: "Manage", dropdown: ["Products"] },
-  { name: "Bookings", dropdown: ["Bookings"] },
+  { name: "Create", dropdown: [{ label: "New Product", href: "/admin/products/new" }] },
+  { name: "Manage", dropdown: [{ label: "Products" }] },
+  { name: "Bookings", dropdown: [{ label: "Bookings" }] },
   { name: "Performance" },
   { name: "Finance" },
 ];
@@ -26,6 +27,8 @@ const menuTabs = [
 export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const router = useRouter();
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     fetch("/api/destinations")
@@ -42,6 +45,38 @@ export default function AdminDashboard() {
       });
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        openDropdown &&
+        dropdownRefs.current[openDropdown] &&
+        !dropdownRefs.current[openDropdown]?.contains(event.target as Node)
+      ) {
+        setOpenDropdown(null);
+      }
+    }
+    if (openDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDropdown]);
+
+  const handleDropdownClick = (tabName: string) => {
+    setOpenDropdown(openDropdown === tabName ? null : tabName);
+  };
+
+  const handleDropdownItemClick = (item: any) => {
+    if (item.href) {
+      router.push(item.href);
+      setOpenDropdown(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation Bar */}
@@ -53,12 +88,11 @@ export default function AdminDashboard() {
               <div
                 key={tab.name}
                 className="relative"
-                onMouseEnter={() => tab.dropdown && setOpenDropdown(tab.name)}
-                onMouseLeave={() => tab.dropdown && setOpenDropdown(null)}
+                ref={el => (dropdownRefs.current[tab.name] = el)}
               >
                 <button
                   className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
-                  onClick={() => tab.dropdown && setOpenDropdown(tab.name)}
+                  onClick={() => tab.dropdown ? handleDropdownClick(tab.name) : undefined}
                 >
                   {tab.name}
                 </button>
@@ -66,10 +100,11 @@ export default function AdminDashboard() {
                   <div className="absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
                     {tab.dropdown.map((item) => (
                       <div
-                        key={item}
+                        key={item.label}
                         className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleDropdownItemClick(item)}
                       >
-                        {item}
+                        {item.label}
                       </div>
                     ))}
                   </div>
