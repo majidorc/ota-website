@@ -197,6 +197,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [keywordInput, setKeywordInput] = useState<string>("");
   const [inclusions, setInclusions] = useState<string[]>([]);
   const [inclusionInput, setInclusionInput] = useState<string>("");
+  const [exclusions, setExclusions] = useState<string[]>([]);
+  const [exclusionInput, setExclusionInput] = useState<string>("");
 
   // Steps definition
   const steps = [
@@ -648,7 +650,32 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">9</span>
               <span className="font-semibold">Exclusions</span>
             </div>
-            <div className="mb-4">(Placeholder) List what is NOT included in this product.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">List what is NOT included in this product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={exclusionInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setExclusionInput(e.target.value)}
+                maxLength={80}
+                placeholder="Add an exclusion and press Enter"
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Enter' && exclusionInput.trim()) {
+                    setExclusions([...exclusions, exclusionInput.trim()]);
+                    setExclusionInput("");
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <div className="flex flex-wrap gap-2 mb-2">
+                {exclusions.map((exc, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                    {exc}
+                    <button type="button" className="ml-1 text-red-500" onClick={() => setExclusions(exclusions.filter((_, idx) => idx !== i))}>Remove</button>
+                  </span>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">List all items/services NOT included in the price.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Continue</button>
