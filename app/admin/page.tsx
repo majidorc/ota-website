@@ -59,7 +59,7 @@ export default function AdminDashboard() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: Event) {
       if (
         openDropdown &&
         dropdownRefs.current[openDropdown] &&
