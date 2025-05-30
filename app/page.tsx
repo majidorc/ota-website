@@ -1,9 +1,12 @@
 import Image from 'next/image'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import Navbar from './components/Navbar'
+import SearchBar from './components/SearchBar'
 
 export default function Home() {
   return (
     <div className="min-h-screen">
+      <Navbar />
+      
       {/* Hero Section */}
       <section className="relative h-[600px] bg-gradient-to-r from-blue-600 to-blue-800">
         <div className="absolute inset-0 bg-black/40" />
@@ -15,18 +18,7 @@ export default function Home() {
             Find and book amazing experiences around the world
           </p>
           
-          {/* Search Bar */}
-          <div className="w-full max-w-3xl bg-white rounded-lg p-2 flex items-center">
-            <input
-              type="text"
-              placeholder="Where do you want to go?"
-              className="flex-1 px-4 py-2 text-gray-900 focus:outline-none"
-            />
-            <button className="btn-primary flex items-center gap-2">
-              <MagnifyingGlassIcon className="w-5 h-5" />
-              Search
-            </button>
-          </div>
+          <SearchBar />
         </div>
       </section>
 
