@@ -41,6 +41,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [showNewProductForm, setShowNewProductForm] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/destinations")
@@ -93,12 +94,23 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 text-[15px]">
       {/* Top Navigation Bar */}
-      <nav className="flex flex-col md:flex-row md:items-center md:justify-between bg-white px-4 md:px-8 py-4 shadow-sm border-b gap-4 md:gap-0">
+      <nav className="flex flex-col md:flex-row md:items-center md:justify-between bg-white px-4 md:px-8 py-4 shadow-sm border-b gap-4 md:gap-0 relative">
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 w-full md:w-auto">
           <span className="font-bold text-lg md:text-xl text-blue-600">Admin Panel</span>
-          <div className="flex flex-col sm:flex-row gap-2 md:gap-6 w-full md:w-auto">
+          {/* Hamburger for mobile */}
+          <button
+            className="md:hidden absolute right-4 top-4 z-30"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Open menu"
+          >
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-blue-600">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          {/* Desktop nav */}
+          <div className="hidden md:flex flex-col sm:flex-row gap-2 md:gap-6 w-full md:w-auto">
             {menuTabs.map((tab) => (
               <div
                 key={tab.name}
@@ -127,6 +139,50 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+          {/* Mobile slide-in menu */}
+          {mobileMenuOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-30 z-20 md:hidden" onClick={() => setMobileMenuOpen(false)}>
+              <div className="absolute top-0 left-0 w-64 h-full bg-white shadow-lg p-6" onClick={e => e.stopPropagation()}>
+                <button className="mb-6" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <nav className="flex flex-col gap-4">
+                  {menuTabs.map((tab) => (
+                    <div key={tab.name}>
+                      <button
+                        className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1 w-full text-left"
+                        onClick={() => {
+                          if (tab.dropdown) handleDropdownClick(tab.name);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {tab.name}
+                      </button>
+                      {/* Show dropdown items inline for mobile */}
+                      {tab.dropdown && openDropdown === tab.name && (
+                        <div className="ml-4 mt-1 flex flex-col gap-1">
+                          {tab.dropdown.map((item) => (
+                            <button
+                              key={item.label}
+                              className="text-sm text-gray-600 hover:text-blue-600 text-left"
+                              onClick={() => {
+                                handleDropdownItemClick(item);
+                                setMobileMenuOpen(false);
+                              }}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold text-center md:text-left">Unlocked – Spring 2025 <span className="ml-1 bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px] align-middle">NEW</span></span>
@@ -195,10 +251,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [locationInput, setLocationInput] = useState<string>("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>("");
-  const [inclusions, setInclusions] = useState<string[]>([]);
-  const [inclusionInput, setInclusionInput] = useState<string>("");
-  const [exclusions, setExclusions] = useState<string[]>([]);
-  const [exclusionInput, setExclusionInput] = useState<string>("");
+  const [inclusionsText, setInclusionsText] = useState<string>("");
+  const [exclusionsText, setExclusionsText] = useState<string>("");
   // Step 10: Photos
   const [photos, setPhotos] = useState<File[]>([]);
   // Step 11: Options
@@ -214,6 +268,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [meetingPoint, setMeetingPoint] = useState<string>("");
   // Step 15: Important Info
   const [importantInfo, setImportantInfo] = useState<string>("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Steps definition
   const steps = [
@@ -224,8 +279,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
     { label: "Descriptions & Highlights" },
     { label: "Locations" },
     { label: "Keywords" },
-    { label: "Inclusions" },
-    { label: "Exclusions" },
+    { label: "Inclusions & Exclusions" },
     { label: "Photos" },
     { label: "Options" },
     { label: "Pricing" },
@@ -244,7 +298,21 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
     <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
       {/* Sidebar */}
       <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r bg-gray-50 p-4 md:p-6 sticky top-0 h-auto md:h-full">
-        <nav>
+        {/* Accordion toggle for mobile */}
+        <div className="md:hidden mb-2">
+          <button
+            className="w-full flex items-center justify-between px-4 py-2 bg-blue-100 text-blue-700 rounded font-semibold"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-expanded={sidebarOpen}
+            aria-controls="sidebar-steps"
+          >
+            Steps
+            <svg className={`ml-2 transition-transform ${sidebarOpen ? 'rotate-90' : ''}`} width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        <nav id="sidebar-steps" className={`${sidebarOpen ? 'block' : 'hidden'} md:block transition-all duration-200`}>
           <ul className="space-y-2">
             {steps.map((s, idx) => (
               <li key={s.label}>
@@ -263,7 +331,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
       </aside>
       {/* Form Content */}
       <div className="flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-6">Create a new product</h1>
+        <h1 className="text-xl font-bold mb-6">Create a new product</h1>
         {/* Progress bar */}
         <div className="flex items-center mb-8">
           {steps.map((_, idx) => (
@@ -619,38 +687,36 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
             </div>
           </div>
         )}
-        {/* Step 8: Inclusions */}
+        {/* Step 8: Inclusions & Exclusions (merged) */}
         {step === 8 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
               <span className="text-blue-600 font-bold">8</span>
-              <span className="font-semibold">Inclusions</span>
+              <span className="font-semibold">Inclusions & Exclusions</span>
             </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">List what is included in this product</label>
-              <input
-                className="w-full border rounded px-3 py-2 mb-2"
-                value={inclusionInput}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setInclusionInput(e.target.value)}
-                maxLength={80}
-                placeholder="Add an inclusion and press Enter"
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === 'Enter' && inclusionInput.trim()) {
-                    setInclusions([...inclusions, inclusionInput.trim()]);
-                    setInclusionInput("");
-                    e.preventDefault();
-                  }
-                }}
+            <div className="mb-8">
+              <label className="block font-bold mb-2 text-base">What is included? <span className="text-blue-600">🔑</span></label>
+              <div className="text-gray-700 mb-2">List all the features that are included in the price so customers understand the value for money of your activity. Start a new line for each one.</div>
+              <textarea
+                className="w-full border rounded px-3 py-2 mb-1 min-h-[120px]"
+                value={inclusionsText}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setInclusionsText(e.target.value)}
+                maxLength={1000}
+                placeholder={"Snorkeling Equipment (mask and snorkel)\nAccident Insurance\nLife Jacket\nFruits\nPaddle board, Clear Kayak\nDrinking Water Soft Drinks\nLunch and Breakfast\nTransfer pick up\nGuide (English and Russia)\nBeach tower"}
               />
-              <div className="flex flex-wrap gap-2 mb-2">
-                {inclusions.map((inc, i) => (
-                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                    {inc}
-                    <button type="button" className="ml-1 text-red-500" onClick={() => setInclusions(inclusions.filter((_, idx) => idx !== i))}>Remove</button>
-                  </span>
-                ))}
-              </div>
-              <div className="text-xs text-gray-500">List all items/services included in the price.</div>
+              <div className="text-right text-xs text-gray-500">{inclusionsText.length} / 1000</div>
+            </div>
+            <div className="mb-8">
+              <label className="block font-bold mb-2 text-base">What is not included? <span className="text-blue-600">(optional)</span> <span className="text-blue-600">🔑</span></label>
+              <div className="text-gray-700 mb-2">Name what customers need to pay extra for or what they may expect to see that isn't included in the price. This allows customers to appropriately set their expectations.</div>
+              <textarea
+                className="w-full border rounded px-3 py-2 mb-1 min-h-[80px]"
+                value={exclusionsText}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setExclusionsText(e.target.value)}
+                maxLength={1000}
+                placeholder={"National Park Fee, Island fee\nFin\nActivity on the island"}
+              />
+              <div className="text-right text-xs text-gray-500">{exclusionsText.length} / 1000</div>
             </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Back</button>
@@ -658,50 +724,11 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
             </div>
           </div>
         )}
-        {/* Step 9: Exclusions */}
+        {/* Step 9: Photos */}
         {step === 9 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
               <span className="text-blue-600 font-bold">9</span>
-              <span className="font-semibold">Exclusions</span>
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">List what is NOT included in this product</label>
-              <input
-                className="w-full border rounded px-3 py-2 mb-2"
-                value={exclusionInput}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setExclusionInput(e.target.value)}
-                maxLength={80}
-                placeholder="Add an exclusion and press Enter"
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === 'Enter' && exclusionInput.trim()) {
-                    setExclusions([...exclusions, exclusionInput.trim()]);
-                    setExclusionInput("");
-                    e.preventDefault();
-                  }
-                }}
-              />
-              <div className="flex flex-wrap gap-2 mb-2">
-                {exclusions.map((exc, i) => (
-                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                    {exc}
-                    <button type="button" className="ml-1 text-red-500" onClick={() => setExclusions(exclusions.filter((_, idx) => idx !== i))}>Remove</button>
-                  </span>
-                ))}
-              </div>
-              <div className="text-xs text-gray-500">List all items/services NOT included in the price.</div>
-            </div>
-            <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Continue</button>
-            </div>
-          </div>
-        )}
-        {/* Step 10: Photos */}
-        {step === 10 && (
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">10</span>
               <span className="font-semibold">Photos</span>
             </div>
             <div className="mb-4">
@@ -736,16 +763,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500 mt-2">Add high-quality images to attract more bookings.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 11: Options */}
-        {step === 11 && (
+        {/* Step 10: Options */}
+        {step === 10 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">11</span>
+              <span className="text-blue-600 font-bold">10</span>
               <span className="font-semibold">Options</span>
             </div>
             <div className="mb-4">
@@ -789,16 +816,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Add all available booking options (e.g., Adult, Child, Private Tour).</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 12: Pricing */}
-        {step === 12 && (
+        {/* Step 11: Pricing */}
+        {step === 11 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">12</span>
+              <span className="text-blue-600 font-bold">11</span>
               <span className="font-semibold">Pricing</span>
             </div>
             <div className="mb-4">
@@ -826,16 +853,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Set the base price and currency for your product.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 13: Availability */}
-        {step === 13 && (
+        {/* Step 12: Availability */}
+        {step === 12 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">13</span>
+              <span className="text-blue-600 font-bold">12</span>
               <span className="font-semibold">Availability</span>
             </div>
             <div className="mb-4">
@@ -849,16 +876,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Describe when your product is available for booking.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 14: Meeting Point */}
-        {step === 14 && (
+        {/* Step 13: Meeting Point */}
+        {step === 13 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">14</span>
+              <span className="text-blue-600 font-bold">13</span>
               <span className="font-semibold">Meeting Point</span>
             </div>
             <div className="mb-4">
@@ -873,16 +900,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Specify where customers should meet for the activity.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 15: Important Info */}
-        {step === 15 && (
+        {/* Step 14: Important Info */}
+        {step === 14 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">15</span>
+              <span className="text-blue-600 font-bold">14</span>
               <span className="font-semibold">Important Info</span>
             </div>
             <div className="mb-4">
@@ -897,16 +924,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Add any important notes or restrictions for customers.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(16)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Continue</button>
             </div>
           </div>
         )}
-        {/* Step 16: Review & Submit */}
-        {step === 16 && (
+        {/* Step 15: Review & Submit */}
+        {step === 15 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">16</span>
+              <span className="text-blue-600 font-bold">15</span>
               <span className="font-semibold">Review & Submit</span>
             </div>
             <div className="mb-4">
@@ -921,8 +948,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 <li><b>Highlights:</b> {highlights.join(", ")}</li>
                 <li><b>Locations:</b> {locations.join(", ")}</li>
                 <li><b>Keywords:</b> {keywords.join(", ")}</li>
-                <li><b>Inclusions:</b> {inclusions.join(", ")}</li>
-                <li><b>Exclusions:</b> {exclusions.join(", ")}</li>
+                <li><b>Inclusions:</b> {inclusionsText}</li>
+                <li><b>Exclusions:</b> {exclusionsText}</li>
                 <li><b>Options:</b> {options.map(o => o.name).join(", ")}</li>
                 <li><b>Price:</b> {price} {currency}</li>
                 <li><b>Availability:</b> {availability}</li>
@@ -932,7 +959,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               </ul>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Back</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
               <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold">Submit</button>
             </div>
           </div>
