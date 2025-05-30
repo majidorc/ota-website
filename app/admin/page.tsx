@@ -191,6 +191,12 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [fullDesc, setFullDesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [highlightInput, setHighlightInput] = useState<string>("");
+  const [locations, setLocations] = useState<string[]>([]);
+  const [locationInput, setLocationInput] = useState<string>("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState<string>("");
+  const [inclusions, setInclusions] = useState<string[]>([]);
+  const [inclusionInput, setInclusionInput] = useState<string>("");
 
   // Steps definition
   const steps = [
@@ -279,8 +285,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 onClick={onCancel}
               >Cancel</button>
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={!language}
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(2)}
               >Continue</button>
             </div>
@@ -321,8 +326,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 onClick={() => setStep(1)}
               >Back</button>
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={!category}
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(3)}
               >Continue</button>
             </div>
@@ -394,8 +398,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 onClick={() => setStep(2)}
               >Back</button>
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={contentMode === "copy" && content.length < 700}
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(4)}
               >Continue</button>
             </div>
@@ -436,8 +439,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 onClick={() => setStep(3)}
               >Back</button>
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={title.length < 10}
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(5)}
               >Continue</button>
             </div>
@@ -504,8 +506,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 onClick={() => setStep(4)}
               >Back</button>
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={shortDesc.length < 20 || fullDesc.length < 500 || highlights.length < 3}
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(6)}
               >Continue</button>
             </div>
@@ -518,7 +519,44 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">6</span>
               <span className="font-semibold">Locations</span>
             </div>
-            <div className="mb-4">(Placeholder) Add locations for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add locations for your product</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border rounded px-3 py-2"
+                  value={locationInput}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setLocationInput(e.target.value)}
+                  maxLength={80}
+                  placeholder="Enter a location (city, landmark, etc.)"
+                  onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === 'Enter' && locationInput.trim()) {
+                      setLocations([...locations, locationInput.trim()]);
+                      setLocationInput("");
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
+                  type="button"
+                  onClick={() => {
+                    if (locationInput.trim()) {
+                      setLocations([...locations, locationInput.trim()]);
+                      setLocationInput("");
+                    }
+                  }}
+                >Add</button>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {locations.map((loc, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                    {loc}
+                    <button type="button" className="ml-1 text-red-500" onClick={() => setLocations(locations.filter((_, idx) => idx !== i))}>Remove</button>
+                  </span>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">Add all relevant locations (e.g., cities, landmarks, meeting points).</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(5)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Continue</button>
@@ -532,7 +570,32 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">7</span>
               <span className="font-semibold">Keywords</span>
             </div>
-            <div className="mb-4">(Placeholder) Add keywords for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add keywords for your product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={keywordInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setKeywordInput(e.target.value)}
+                maxLength={40}
+                placeholder="Add a keyword and press Enter"
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Enter' && keywordInput.trim()) {
+                    setKeywords([...keywords, keywordInput.trim()]);
+                    setKeywordInput("");
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <div className="flex flex-wrap gap-2 mb-2">
+                {keywords.map((kw, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                    {kw}
+                    <button type="button" className="ml-1 text-red-500" onClick={() => setKeywords(keywords.filter((_, idx) => idx !== i))}>Remove</button>
+                  </span>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">Add keywords to help customers find your product.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(6)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Continue</button>
@@ -546,7 +609,32 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">8</span>
               <span className="font-semibold">Inclusions</span>
             </div>
-            <div className="mb-4">(Placeholder) List what is included in this product.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">List what is included in this product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={inclusionInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setInclusionInput(e.target.value)}
+                maxLength={80}
+                placeholder="Add an inclusion and press Enter"
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Enter' && inclusionInput.trim()) {
+                    setInclusions([...inclusions, inclusionInput.trim()]);
+                    setInclusionInput("");
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <div className="flex flex-wrap gap-2 mb-2">
+                {inclusions.map((inc, i) => (
+                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                    {inc}
+                    <button type="button" className="ml-1 text-red-500" onClick={() => setInclusions(inclusions.filter((_, idx) => idx !== i))}>Remove</button>
+                  </span>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">List all items/services included in the price.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Continue</button>
