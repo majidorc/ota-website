@@ -6,8 +6,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing content' }, { status: 400 });
   }
 
-  // TEMP: Hardcoded API key for testing new quota
-  const GEMINI_API_KEY = "AIzaSyBCPFoarhdEYV-8OxB7dj6olDTuOqXLquc";
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    return NextResponse.json({ error: "Missing Gemini API key" }, { status: 500 });
+  }
+
   const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-001:generateContent?key=${GEMINI_API_KEY}`;
 
   // Prompt for Gemini
