@@ -199,6 +199,21 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [inclusionInput, setInclusionInput] = useState<string>("");
   const [exclusions, setExclusions] = useState<string[]>([]);
   const [exclusionInput, setExclusionInput] = useState<string>("");
+  // Step 10: Photos
+  const [photos, setPhotos] = useState<File[]>([]);
+  // Step 11: Options
+  const [options, setOptions] = useState<{ name: string; description: string }[]>([]);
+  const [optionName, setOptionName] = useState("");
+  const [optionDesc, setOptionDesc] = useState("");
+  // Step 12: Pricing
+  const [price, setPrice] = useState<string>("");
+  const [currency, setCurrency] = useState<string>("THB");
+  // Step 13: Availability
+  const [availability, setAvailability] = useState<string>("");
+  // Step 14: Meeting Point
+  const [meetingPoint, setMeetingPoint] = useState<string>("");
+  // Step 15: Important Info
+  const [importantInfo, setImportantInfo] = useState<string>("");
 
   // Steps definition
   const steps = [
@@ -689,7 +704,37 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">10</span>
               <span className="font-semibold">Photos</span>
             </div>
-            <div className="mb-4">(Placeholder) Upload photos for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Upload photos for your product</label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={e => {
+                  if (e.target.files) {
+                    setPhotos([...photos, ...Array.from(e.target.files)]);
+                  }
+                }}
+                className="mb-2"
+              />
+              <div className="flex flex-wrap gap-2">
+                {photos.map((file, i) => (
+                  <div key={i} className="relative w-24 h-24 border rounded overflow-hidden">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Photo ${i + 1}`}
+                      className="object-cover w-full h-full"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      onClick={() => setPhotos(photos.filter((_, idx) => idx !== i))}
+                    >×</button>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500 mt-2">Add high-quality images to attract more bookings.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Continue</button>
@@ -703,7 +748,46 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">11</span>
               <span className="font-semibold">Options</span>
             </div>
-            <div className="mb-4">(Placeholder) Add booking options for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add booking options for your product</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border rounded px-3 py-2"
+                  value={optionName}
+                  onChange={e => setOptionName(e.target.value)}
+                  maxLength={40}
+                  placeholder="Option name"
+                />
+                <input
+                  className="flex-1 border rounded px-3 py-2"
+                  value={optionDesc}
+                  onChange={e => setOptionDesc(e.target.value)}
+                  maxLength={80}
+                  placeholder="Description"
+                />
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
+                  type="button"
+                  onClick={() => {
+                    if (optionName.trim()) {
+                      setOptions([...options, { name: optionName.trim(), description: optionDesc.trim() }]);
+                      setOptionName("");
+                      setOptionDesc("");
+                    }
+                  }}
+                >Add</button>
+              </div>
+              <div className="flex flex-col gap-2 mb-2">
+                {options.map((opt, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-blue-50 rounded px-3 py-2">
+                    <span className="font-semibold text-blue-800">{opt.name}</span>
+                    <span className="text-gray-600">{opt.description}</span>
+                    <button type="button" className="ml-auto text-red-500" onClick={() => setOptions(options.filter((_, idx) => idx !== i))}>Remove</button>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">Add all available booking options (e.g., Adult, Child, Private Tour).</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Continue</button>
@@ -717,7 +801,30 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">12</span>
               <span className="font-semibold">Pricing</span>
             </div>
-            <div className="mb-4">(Placeholder) Set pricing for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Set pricing for your product</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  className="flex-1 border rounded px-3 py-2"
+                  value={price}
+                  onChange={e => setPrice(e.target.value)}
+                  maxLength={10}
+                  placeholder="Price"
+                  type="number"
+                  min="0"
+                />
+                <select
+                  className="border rounded px-3 py-2"
+                  value={currency}
+                  onChange={e => setCurrency(e.target.value)}
+                >
+                  <option value="THB">THB</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+              <div className="text-xs text-gray-500">Set the base price and currency for your product.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Continue</button>
@@ -731,7 +838,16 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">13</span>
               <span className="font-semibold">Availability</span>
             </div>
-            <div className="mb-4">(Placeholder) Set availability for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Set availability for your product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={availability}
+                onChange={e => setAvailability(e.target.value)}
+                placeholder="e.g. Daily, Weekends, 1 Jan - 31 Mar, etc."
+              />
+              <div className="text-xs text-gray-500">Describe when your product is available for booking.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Continue</button>
@@ -745,7 +861,17 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">14</span>
               <span className="font-semibold">Meeting Point</span>
             </div>
-            <div className="mb-4">(Placeholder) Add meeting point details for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add meeting point details for your product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={meetingPoint}
+                onChange={e => setMeetingPoint(e.target.value)}
+                maxLength={120}
+                placeholder="e.g. Hotel pickup, Main entrance, etc."
+              />
+              <div className="text-xs text-gray-500">Specify where customers should meet for the activity.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Continue</button>
@@ -759,7 +885,17 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">15</span>
               <span className="font-semibold">Important Info</span>
             </div>
-            <div className="mb-4">(Placeholder) Add important information for your product here.</div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add important information for your product</label>
+              <textarea
+                className="w-full border rounded px-3 py-2 mb-2 min-h-[80px]"
+                value={importantInfo}
+                onChange={e => setImportantInfo(e.target.value)}
+                maxLength={500}
+                placeholder="e.g. Not suitable for children under 6, bring sunscreen, etc."
+              />
+              <div className="text-xs text-gray-500">Add any important notes or restrictions for customers.</div>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
               <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(16)}>Continue</button>
@@ -773,7 +909,28 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <span className="text-blue-600 font-bold">16</span>
               <span className="font-semibold">Review & Submit</span>
             </div>
-            <div className="mb-4">(Placeholder) Review all your product details and submit.</div>
+            <div className="mb-4">
+              <h2 className="font-bold mb-2">Review your product details</h2>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li><b>Language:</b> {language}</li>
+                <li><b>Category:</b> {category}</li>
+                <li><b>Title:</b> {title}</li>
+                <li><b>Reference Code:</b> {referenceCode}</li>
+                <li><b>Short Description:</b> {shortDesc}</li>
+                <li><b>Full Description:</b> {fullDesc}</li>
+                <li><b>Highlights:</b> {highlights.join(", ")}</li>
+                <li><b>Locations:</b> {locations.join(", ")}</li>
+                <li><b>Keywords:</b> {keywords.join(", ")}</li>
+                <li><b>Inclusions:</b> {inclusions.join(", ")}</li>
+                <li><b>Exclusions:</b> {exclusions.join(", ")}</li>
+                <li><b>Options:</b> {options.map(o => o.name).join(", ")}</li>
+                <li><b>Price:</b> {price} {currency}</li>
+                <li><b>Availability:</b> {availability}</li>
+                <li><b>Meeting Point:</b> {meetingPoint}</li>
+                <li><b>Important Info:</b> {importantInfo}</li>
+                <li><b>Photos:</b> {photos.length} uploaded</li>
+              </ul>
+            </div>
             <div className="flex justify-between">
               <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Back</button>
               <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold">Submit</button>
