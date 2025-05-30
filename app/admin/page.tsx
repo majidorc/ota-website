@@ -95,10 +95,10 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation Bar */}
-      <nav className="flex items-center justify-between bg-white px-8 py-4 shadow-sm border-b">
-        <div className="flex items-center gap-8">
-          <span className="font-bold text-lg text-blue-600">Admin Panel</span>
-          <div className="flex gap-6">
+      <nav className="flex flex-col md:flex-row md:items-center md:justify-between bg-white px-4 md:px-8 py-4 shadow-sm border-b gap-4 md:gap-0">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 w-full md:w-auto">
+          <span className="font-bold text-lg md:text-xl text-blue-600">Admin Panel</span>
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-6 w-full md:w-auto">
             {menuTabs.map((tab) => (
               <div
                 key={tab.name}
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
                 ref={(el: HTMLDivElement | null) => { dropdownRefs.current[tab.name] = el; }}
               >
                 <button
-                  className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
+                  className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1 w-full text-left md:text-center"
                   onClick={() => tab.dropdown ? handleDropdownClick(tab.name) : undefined}
                 >
                   {tab.name}
@@ -128,9 +128,9 @@ export default function AdminDashboard() {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-6">
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Unlocked – Spring 2025 <span className="ml-1 bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px] align-middle">NEW</span></span>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
+          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold text-center md:text-left">Unlocked – Spring 2025 <span className="ml-1 bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px] align-middle">NEW</span></span>
+          <div className="flex items-center gap-2 justify-center md:justify-start">
             <span className="font-semibold text-gray-700">Majid</span>
             <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">M</div>
           </div>
