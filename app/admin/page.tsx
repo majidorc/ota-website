@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
     setOpenDropdown(openDropdown === tabName ? null : tabName);
   };
 
-  const handleDropdownItemClick = (item: any) => {
+  const handleDropdownItemClick = (item: { label: string; href?: string }) => {
     if (item.label === "New Product") {
       setShowNewProductForm(true);
       setOpenDropdown(null);
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
               <div
                 key={tab.name}
                 className="relative"
-                ref={el => { dropdownRefs.current[tab.name] = el; }}
+                ref={(el: HTMLDivElement | null) => { dropdownRefs.current[tab.name] = el; }}
               >
                 <button
                   className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
@@ -180,310 +180,492 @@ export default function AdminDashboard() {
 }
 
 function NewProductForm({ onCancel }: { onCancel: () => void }) {
-  const [step, setStep] = useState(1);
-  const [language, setLanguage] = useState("");
-  const [category, setCategory] = useState("");
-  const [contentMode, setContentMode] = useState("copy");
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [referenceCode, setReferenceCode] = useState("");
-  const [shortDesc, setShortDesc] = useState("");
-  const [fullDesc, setFullDesc] = useState("");
+  const [step, setStep] = useState<number>(1);
+  const [language, setLanguage] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [contentMode, setContentMode] = useState<string>("copy");
+  const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [referenceCode, setReferenceCode] = useState<string>("");
+  const [shortDesc, setShortDesc] = useState<string>("");
+  const [fullDesc, setFullDesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
-  const [highlightInput, setHighlightInput] = useState("");
+  const [highlightInput, setHighlightInput] = useState<string>("");
+
+  // Steps definition
+  const steps = [
+    { label: "Product Language" },
+    { label: "Product Category" },
+    { label: "Automated Content Creator" },
+    { label: "Main Information" },
+    { label: "Descriptions & Highlights" },
+    { label: "Locations" },
+    { label: "Keywords" },
+    { label: "Inclusions" },
+    { label: "Exclusions" },
+    { label: "Photos" },
+    { label: "Options" },
+    { label: "Pricing" },
+    { label: "Availability" },
+    { label: "Meeting Point" },
+    { label: "Important Info" },
+    { label: "Review & Submit" },
+  ];
+
+  // Sidebar navigation handler
+  const handleSidebarClick = (idx: number) => {
+    if (idx + 1 < step) setStep(idx + 1);
+  };
 
   return (
-    <div className="w-full max-w-3xl bg-white rounded shadow p-8 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Create a new product</h1>
-      {/* Progress bar */}
-      <div className="flex items-center mb-8">
-        <div className={`flex-1 h-1 rounded ${step >= 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-        <div className={`flex-1 h-1 rounded mx-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-        <div className={`flex-1 h-1 rounded ${step >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-      </div>
-      {/* Step 1: Language */}
-      {step === 1 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">1</span>
-            <span className="font-semibold">Product Language</span>
-          </div>
-          <p className="mb-2 text-gray-700">What language will you use to write your activity?</p>
-          <p className="mb-4 text-gray-500 text-sm">You can now write your activity in multiple languages. We'll take care of all the translations.</p>
-          <select
-            className="w-full border rounded px-3 py-2 mb-4"
-            value={language}
-            onChange={e => setLanguage(e.target.value)}
-          >
-            <option value="">Select a language</option>
-            {languages.map(lang => (
-              <option key={lang} value={lang}>{lang}</option>
+    <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r bg-gray-50 p-4 md:p-6 sticky top-0 h-auto md:h-full">
+        <nav>
+          <ul className="space-y-2">
+            {steps.map((s, idx) => (
+              <li key={s.label}>
+                <button
+                  className={`w-full text-left px-4 py-2 rounded font-medium transition-colors
+                    ${step === idx + 1 ? 'bg-blue-600 text-white' : idx + 1 < step ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-400 cursor-not-allowed'}`}
+                  disabled={idx + 1 > step}
+                  onClick={() => handleSidebarClick(idx)}
+                >
+                  <span className="mr-2 font-bold">{idx + 1}.</span> {s.label}
+                </button>
+              </li>
             ))}
-          </select>
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
-            <b>Product language and categories cannot be changed</b><br />
-            This is because we customize the product creation process according to your initial selection. If you've selected the wrong language or category, please delete this one and create a new product.
-          </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={onCancel}
-            >Cancel</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled={!language}
-              onClick={() => setStep(2)}
-            >Continue</button>
-          </div>
+          </ul>
+        </nav>
+      </aside>
+      {/* Form Content */}
+      <div className="flex-1 p-8">
+        <h1 className="text-2xl font-bold mb-6">Create a new product</h1>
+        {/* Progress bar */}
+        <div className="flex items-center mb-8">
+          {steps.map((_, idx) => (
+            <div
+              key={idx}
+              className={`flex-1 h-1 rounded ${step > idx ? 'bg-blue-600' : 'bg-gray-200'} ${idx !== 0 ? 'mx-1' : ''}`}
+            ></div>
+          ))}
         </div>
-      )}
-      {/* Step 2: Category */}
-      {step === 2 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">2</span>
-            <span className="font-semibold">Product Category</span>
-          </div>
-          <p className="mb-2 text-gray-700">Which best describes your activity?</p>
-          <p className="mb-4 text-gray-500 text-sm">This helps us categorize your product so customers can find it. Choose carefully as this is the only section that can't be changed later.</p>
-          <div className="space-y-2 mb-4">
-            {categories.map(cat => (
-              <label key={cat.label} className={`block border rounded p-4 cursor-pointer ${category === cat.label ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-white'}`}>
-                <input
-                  type="radio"
-                  name="category"
-                  value={cat.label}
-                  checked={category === cat.label}
-                  onChange={() => setCategory(cat.label)}
-                  className="mr-2"
-                />
-                <span className="font-semibold">{cat.label}</span>
-                <span className="block text-gray-500 text-sm mt-1">{cat.description}</span>
-              </label>
-            ))}
-          </div>
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
-            <b>Product language and categories cannot be changed</b><br />
-            This is because we customize the product creation process according to your initial selection. If you've selected the wrong language or category, please delete this one and create a new product.
-          </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(1)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled={!category}
-              onClick={() => setStep(3)}
-            >Continue</button>
-          </div>
-        </div>
-      )}
-      {/* Step 3: Automated content creator */}
-      {step === 3 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">3</span>
-            <span className="font-semibold">Automated content creator</span>
-          </div>
-          <div className="mb-4">
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
-              <b>How it works</b>
-              <ol className="list-decimal ml-6 mt-2 text-gray-700">
-                <li>Provide your content, then we'll fill out most of the sections for you</li>
-                <li>Check for accuracy and make changes if necessary</li>
-                <li>You'll still need to upload photos and create the booking options yourself</li>
-              </ol>
+        {/* Step 1: Language */}
+        {step === 1 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">1</span>
+              <span className="font-semibold">Product Language</span>
             </div>
+            <p className="mb-2 text-gray-700">What language will you use to write your activity?</p>
+            <p className="mb-4 text-gray-500 text-sm">You can now write your activity in multiple languages. We'll take care of all the translations.</p>
+            <select
+              className="w-full border rounded px-3 py-2 mb-4"
+              value={language}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setLanguage(e.target.value)}
+            >
+              <option value="">Select a language</option>
+              {languages.map((lang: string) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
-              Products using the automated creator are likely to get more bookings, plus it saves you time.
+              <b>Product language and categories cannot be changed</b><br />
+              This is because we customize the product creation process according to your initial selection. If you've selected the wrong language or category, please delete this one and create a new product.
             </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-2">Get started</label>
-              <div className="flex gap-4 mb-4">
-                <label className="flex items-center cursor-pointer">
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={onCancel}
+              >Cancel</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled={!language}
+                onClick={() => setStep(2)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 2: Category */}
+        {step === 2 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">2</span>
+              <span className="font-semibold">Product Category</span>
+            </div>
+            <p className="mb-2 text-gray-700">Which best describes your activity?</p>
+            <p className="mb-4 text-gray-500 text-sm">This helps us categorize your product so customers can find it. Choose carefully as this is the only section that can't be changed later.</p>
+            <div className="space-y-2 mb-4">
+              {categories.map((cat: { label: string; description: string }) => (
+                <label key={cat.label} className={`block border rounded p-4 cursor-pointer ${category === cat.label ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-white'}`}>
                   <input
                     type="radio"
-                    name="contentMode"
-                    value="copy"
-                    checked={contentMode === "copy"}
-                    onChange={() => setContentMode("copy")}
+                    name="category"
+                    value={cat.label}
+                    checked={category === cat.label}
+                    onChange={() => setCategory(cat.label)}
                     className="mr-2"
                   />
-                  Copy and paste your content <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded">Recommended</span>
+                  <span className="font-semibold">{cat.label}</span>
+                  <span className="block text-gray-500 text-sm mt-1">{cat.description}</span>
                 </label>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="contentMode"
-                    value="manual"
-                    checked={contentMode === "manual"}
-                    onChange={() => setContentMode("manual")}
-                    className="mr-2"
-                  />
-                  Skip and create product manually
-                </label>
-              </div>
-              {contentMode === "copy" && (
-                <div className="mb-4">
-                  <label className="block mb-2 font-semibold">Get started by copy-pasting a detailed description about your activity here.</label>
-                  <textarea
-                    className="w-full border rounded px-3 py-2 min-h-[120px]"
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    placeholder="Write at least 700 characters."
-                    maxLength={5000}
-                  />
-                  <div className="text-right text-xs text-gray-500">{content.length} / 5000</div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(2)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled={contentMode === "copy" && content.length < 700}
-              onClick={() => setStep(4)}
-            >Continue</button>
-          </div>
-        </div>
-      )}
-      {/* Step 4: Main Information */}
-      {step === 4 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">4</span>
-            <span className="font-semibold">Main Information</span>
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">What is the customer-facing title of your product?</label>
-            <input
-              className="w-full border rounded px-3 py-2 mb-2"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              maxLength={60}
-              placeholder="e.g. From Phuket: Krabi and Phang Nga Bay Island Hopping Tour"
-            />
-            <div className="text-right text-xs text-gray-500">{title.length} / 60</div>
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Create a product reference code <span className="text-xs text-gray-400">(optional)</span></label>
-            <input
-              className="w-full border rounded px-3 py-2 mb-2"
-              value={referenceCode}
-              onChange={e => setReferenceCode(e.target.value)}
-              maxLength={20}
-              placeholder="e.g. HKT0097"
-            />
-            <div className="text-right text-xs text-gray-500">{referenceCode.length} / 20</div>
-          </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(3)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled={title.length < 10}
-              onClick={() => setStep(5)}
-            >Continue</button>
-          </div>
-        </div>
-      )}
-      {/* Step 5: Descriptions & Highlights */}
-      {step === 5 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">5</span>
-            <span className="font-semibold">Descriptions & Highlights</span>
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Introduce your product</label>
-            <input
-              className="w-full border rounded px-3 py-2 mb-2"
-              value={shortDesc}
-              onChange={e => setShortDesc(e.target.value)}
-              maxLength={200}
-              placeholder="Short intro (2-3 sentences)"
-            />
-            <div className="text-right text-xs text-gray-500">{shortDesc.length} / 200</div>
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Add a full description</label>
-            <textarea
-              className="w-full border rounded px-3 py-2 mb-2 min-h-[120px]"
-              value={fullDesc}
-              onChange={e => setFullDesc(e.target.value)}
-              maxLength={3000}
-              placeholder="Full description (at least 500 characters)"
-            />
-            <div className="text-right text-xs text-gray-500">{fullDesc.length} / 3000</div>
-          </div>
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Summarize the highlights</label>
-            <input
-              className="w-full border rounded px-3 py-2 mb-2"
-              value={highlightInput}
-              onChange={e => setHighlightInput(e.target.value)}
-              maxLength={80}
-              placeholder="Add a highlight and press Enter"
-              onKeyDown={e => {
-                if (e.key === 'Enter' && highlightInput.trim()) {
-                  setHighlights([...highlights, highlightInput.trim()]);
-                  setHighlightInput("");
-                  e.preventDefault();
-                }
-              }}
-            />
-            <div className="flex flex-wrap gap-2 mb-2">
-              {highlights.map((h, i) => (
-                <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                  {h}
-                  <button type="button" className="ml-1 text-red-500" onClick={() => setHighlights(highlights.filter((_, idx) => idx !== i))}>Remove</button>
-                </span>
               ))}
             </div>
-            <div className="text-xs text-gray-500">Write 3-5 highlights. Each up to 80 characters.</div>
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+              <b>Product language and categories cannot be changed</b><br />
+              This is because we customize the product creation process according to your initial selection. If you've selected the wrong language or category, please delete this one and create a new product.
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(1)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled={!category}
+                onClick={() => setStep(3)}
+              >Continue</button>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(4)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled={shortDesc.length < 20 || fullDesc.length < 500 || highlights.length < 3}
-              onClick={() => setStep(6)}
-            >Continue</button>
+        )}
+        {/* Step 3: Automated content creator */}
+        {step === 3 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">3</span>
+              <span className="font-semibold">Automated content creator</span>
+            </div>
+            <div className="mb-4">
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                <b>How it works</b>
+                <ol className="list-decimal ml-6 mt-2 text-gray-700">
+                  <li>Provide your content, then we'll fill out most of the sections for you</li>
+                  <li>Check for accuracy and make changes if necessary</li>
+                  <li>You'll still need to upload photos and create the booking options yourself</li>
+                </ol>
+              </div>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                Products using the automated creator are likely to get more bookings, plus it saves you time.
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Get started</label>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contentMode"
+                      value="copy"
+                      checked={contentMode === "copy"}
+                      onChange={() => setContentMode("copy")}
+                      className="mr-2"
+                    />
+                    Copy and paste your content <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded">Recommended</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contentMode"
+                      value="manual"
+                      checked={contentMode === "manual"}
+                      onChange={() => setContentMode("manual")}
+                      className="mr-2"
+                    />
+                    Skip and create product manually
+                  </label>
+                </div>
+                {contentMode === "copy" && (
+                  <div className="mb-4">
+                    <label className="block mb-2 font-semibold">Get started by copy-pasting a detailed description about your activity here.</label>
+                    <textarea
+                      className="w-full border rounded px-3 py-2 min-h-[120px]"
+                      value={content}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                      placeholder="Write at least 700 characters."
+                      maxLength={5000}
+                    />
+                    <div className="text-right text-xs text-gray-500">{content.length} / 5000</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(2)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled={contentMode === "copy" && content.length < 700}
+                onClick={() => setStep(4)}
+              >Continue</button>
+            </div>
           </div>
-        </div>
-      )}
-      {/* Step 6: Placeholder */}
-      {step === 6 && (
-        <div>
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-blue-600 font-bold">6</span>
-            <span className="font-semibold">Locations (Coming soon)</span>
+        )}
+        {/* Step 4: Main Information */}
+        {step === 4 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">4</span>
+              <span className="font-semibold">Main Information</span>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">What is the customer-facing title of your product?</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={title}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                maxLength={60}
+                placeholder="e.g. From Phuket: Krabi and Phang Nga Bay Island Hopping Tour"
+              />
+              <div className="text-right text-xs text-gray-500">{title.length} / 60</div>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Create a product reference code <span className="text-xs text-gray-400">(optional)</span></label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={referenceCode}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setReferenceCode(e.target.value)}
+                maxLength={20}
+                placeholder="e.g. HKT0097"
+              />
+              <div className="text-right text-xs text-gray-500">{referenceCode.length} / 20</div>
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(3)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled={title.length < 10}
+                onClick={() => setStep(5)}
+              >Continue</button>
+            </div>
           </div>
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700 text-sm mb-4">
-            This is a placeholder for the next step. The full step will be implemented next.
+        )}
+        {/* Step 5: Descriptions & Highlights */}
+        {step === 5 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">5</span>
+              <span className="font-semibold">Descriptions & Highlights</span>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Introduce your product</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={shortDesc}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setShortDesc(e.target.value)}
+                maxLength={200}
+                placeholder="Short intro (2-3 sentences)"
+              />
+              <div className="text-right text-xs text-gray-500">{shortDesc.length} / 200</div>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Add a full description</label>
+              <textarea
+                className="w-full border rounded px-3 py-2 mb-2 min-h-[120px]"
+                value={fullDesc}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFullDesc(e.target.value)}
+                maxLength={3000}
+                placeholder="Full description (at least 500 characters)"
+              />
+              <div className="text-right text-xs text-gray-500">{fullDesc.length} / 3000</div>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Summarize the highlights</label>
+              <input
+                className="w-full border rounded px-3 py-2 mb-2"
+                value={highlightInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setHighlightInput(e.target.value)}
+                maxLength={80}
+                placeholder="Add a highlight and press Enter"
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Enter' && highlightInput.trim()) {
+                    setHighlights([...highlights, highlightInput.trim()]);
+                    setHighlightInput("");
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <div className="flex flex-wrap gap-2 mb-2">
+                {highlights.map((h: string, i: number) => (
+                  <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                    {h}
+                    <button type="button" className="ml-1 text-red-500" onClick={() => setHighlights(highlights.filter((_, idx) => idx !== i))}>Remove</button>
+                  </span>
+                ))}
+              </div>
+              <div className="text-xs text-gray-500">Write 3-5 highlights. Each up to 80 characters.</div>
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(4)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+                disabled={shortDesc.length < 20 || fullDesc.length < 500 || highlights.length < 3}
+                onClick={() => setStep(6)}
+              >Continue</button>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(5)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-              disabled
-            >Continue</button>
+        )}
+        {/* Step 6: Locations */}
+        {step === 6 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">6</span>
+              <span className="font-semibold">Locations</span>
+            </div>
+            <div className="mb-4">(Placeholder) Add locations for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(5)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Continue</button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+        {/* Step 7: Keywords */}
+        {step === 7 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">7</span>
+              <span className="font-semibold">Keywords</span>
+            </div>
+            <div className="mb-4">(Placeholder) Add keywords for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(6)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 8: Inclusions */}
+        {step === 8 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">8</span>
+              <span className="font-semibold">Inclusions</span>
+            </div>
+            <div className="mb-4">(Placeholder) List what is included in this product.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 9: Exclusions */}
+        {step === 9 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">9</span>
+              <span className="font-semibold">Exclusions</span>
+            </div>
+            <div className="mb-4">(Placeholder) List what is NOT included in this product.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 10: Photos */}
+        {step === 10 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">10</span>
+              <span className="font-semibold">Photos</span>
+            </div>
+            <div className="mb-4">(Placeholder) Upload photos for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 11: Options */}
+        {step === 11 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">11</span>
+              <span className="font-semibold">Options</span>
+            </div>
+            <div className="mb-4">(Placeholder) Add booking options for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 12: Pricing */}
+        {step === 12 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">12</span>
+              <span className="font-semibold">Pricing</span>
+            </div>
+            <div className="mb-4">(Placeholder) Set pricing for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 13: Availability */}
+        {step === 13 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">13</span>
+              <span className="font-semibold">Availability</span>
+            </div>
+            <div className="mb-4">(Placeholder) Set availability for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 14: Meeting Point */}
+        {step === 14 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">14</span>
+              <span className="font-semibold">Meeting Point</span>
+            </div>
+            <div className="mb-4">(Placeholder) Add meeting point details for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 15: Important Info */}
+        {step === 15 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">15</span>
+              <span className="font-semibold">Important Info</span>
+            </div>
+            <div className="mb-4">(Placeholder) Add important information for your product here.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(16)}>Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 16: Review & Submit */}
+        {step === 16 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">16</span>
+              <span className="font-semibold">Review & Submit</span>
+            </div>
+            <div className="mb-4">(Placeholder) Review all your product details and submit.</div>
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Back</button>
+              <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold">Submit</button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
