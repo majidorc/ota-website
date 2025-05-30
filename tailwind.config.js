@@ -21,6 +21,9 @@ module.exports = {
           900: '#0c4a6e',
         },
       },
+      fontFamily: {
+        sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],
