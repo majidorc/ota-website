@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   if (!GEMINI_API_KEY) {
     return NextResponse.json({ error: "Missing Gemini API key" }, { status: 500 });
   }
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-001:generateContent?key=${GEMINI_API_KEY}`;
 
   // Prompt for Gemini
   const prompt = `Extract the following from the provided activity description:
