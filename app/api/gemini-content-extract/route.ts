@@ -7,8 +7,11 @@ export async function POST(req: NextRequest) {
   }
 
   // Gemini API key (should be in env for production)
-  const GEMINI_API_KEY = "AIzaSyCd2H1HnL33mXYVdDavhdPNfaZDxBlNb-8";
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    return NextResponse.json({ error: "Missing Gemini API key" }, { status: 500 });
+  }
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
   // Prompt for Gemini
   const prompt = `Extract the following from the provided activity description:
@@ -32,8 +35,13 @@ ${content}
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 1024 }
+      contents: [
+        {
+          parts: [
+            { text: content }
+          ]
+        }
+      ]
     })
   });
 
