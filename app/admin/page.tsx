@@ -42,6 +42,8 @@ export default function AdminDashboard() {
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loadingGemini, setLoadingGemini] = useState(false);
+  const [geminiError, setGeminiError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/destinations")
@@ -477,14 +479,59 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 )}
               </div>
             </div>
+            {geminiError && (
+              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{geminiError}</div>
+            )}
+            {loadingGemini && (
+              <div className="flex items-center gap-2 text-blue-600 mb-4">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                Generating suggestions from Gemini...
+              </div>
+            )}
             <div className="flex justify-between">
               <button
                 className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(2)}
+                disabled={loadingGemini}
               >Back</button>
               <button
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
-                onClick={() => setStep(4)}
+                onClick={async () => {
+                  setGeminiError(null);
+                  if (contentMode === "copy" && content.trim()) {
+                    setLoadingGemini(true);
+                    try {
+                      const res = await fetch("/api/gemini-content-extract", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ content })
+                      });
+                      const data = await res.json();
+                      if (data.error) {
+                        setGeminiError("Gemini API error: " + data.error);
+                        setLoadingGemini(false);
+                        return;
+                      }
+                      // Fill next steps with suggestions
+                      setTitle(data.title || "");
+                      setShortDesc(data.shortDescription || "");
+                      setFullDesc(data.fullDescription || "");
+                      setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
+                      setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
+                      setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
+                      setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
+                      setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map(k => k.trim()) : []));
+                      setLoadingGemini(false);
+                      setStep(4);
+                    } catch (err) {
+                      setGeminiError("Failed to connect to Gemini API");
+                      setLoadingGemini(false);
+                    }
+                  } else {
+                    setStep(4);
+                  }
+                }}
+                disabled={loadingGemini || (contentMode === "copy" && !content.trim())}
               >Continue</button>
             </div>
           </div>
