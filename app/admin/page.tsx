@@ -183,6 +183,9 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [step, setStep] = useState(1);
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
+  const [contentMode, setContentMode] = useState("copy");
+  const [content, setContent] = useState("");
+
   return (
     <div className="w-full max-w-3xl bg-white rounded shadow p-8 mx-auto">
       <h1 className="text-2xl font-bold mb-6">Create a new product</h1>
@@ -270,11 +273,84 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
           </div>
         </div>
       )}
-      {/* Step 3: Placeholder */}
+      {/* Step 3: Automated content creator */}
       {step === 3 && (
         <div>
           <div className="mb-4 flex items-center gap-2">
             <span className="text-blue-600 font-bold">3</span>
+            <span className="font-semibold">Automated content creator</span>
+          </div>
+          <div className="mb-4">
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+              <b>How it works</b>
+              <ol className="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Provide your content, then we'll fill out most of the sections for you</li>
+                <li>Check for accuracy and make changes if necessary</li>
+                <li>You'll still need to upload photos and create the booking options yourself</li>
+              </ol>
+            </div>
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+              Products using the automated creator are likely to get more bookings, plus it saves you time.
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2">Get started</label>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contentMode"
+                    value="copy"
+                    checked={contentMode === "copy"}
+                    onChange={() => setContentMode("copy")}
+                    className="mr-2"
+                  />
+                  Copy and paste your content <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded">Recommended</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contentMode"
+                    value="manual"
+                    checked={contentMode === "manual"}
+                    onChange={() => setContentMode("manual")}
+                    className="mr-2"
+                  />
+                  Skip and create product manually
+                </label>
+              </div>
+              {contentMode === "copy" && (
+                <div className="mb-4">
+                  <label className="block mb-2 font-semibold">Get started by copy-pasting a detailed description about your activity here.</label>
+                  <textarea
+                    className="w-full border rounded px-3 py-2 min-h-[120px]"
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    placeholder="Write at least 700 characters."
+                    maxLength={5000}
+                  />
+                  <div className="text-right text-xs text-gray-500">{content.length} / 5000</div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(2)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+              disabled={contentMode === "copy" && content.length < 700}
+              onClick={() => setStep(4)}
+            >Continue</button>
+          </div>
+        </div>
+      )}
+      {/* Step 4: Placeholder */}
+      {step === 4 && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-blue-600 font-bold">4</span>
             <span className="font-semibold">Automated content creator (Coming soon)</span>
           </div>
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700 text-sm mb-4">
@@ -283,7 +359,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
           <div className="flex justify-between">
             <button
               className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(2)}
+              onClick={() => setStep(3)}
             >Back</button>
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
