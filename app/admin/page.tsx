@@ -42,8 +42,6 @@ export default function AdminDashboard() {
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loadingGemini, setLoadingGemini] = useState(false);
-  const [geminiError, setGeminiError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/destinations")
@@ -271,6 +269,9 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   // Step 15: Important Info
   const [importantInfo, setImportantInfo] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Gemini loading and error state
+  const [loadingGemini, setLoadingGemini] = useState(false);
+  const [geminiError, setGeminiError] = useState<string | null>(null);
 
   // Steps definition
   const steps = [
@@ -479,20 +480,10 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 )}
               </div>
             </div>
-            {geminiError && (
-              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{geminiError}</div>
-            )}
-            {loadingGemini && (
-              <div className="flex items-center gap-2 text-blue-600 mb-4">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                Generating suggestions from Gemini...
-              </div>
-            )}
             <div className="flex justify-between">
               <button
                 className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(2)}
-                disabled={loadingGemini}
               >Back</button>
               <button
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
@@ -535,6 +526,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 disabled={loadingGemini || (contentMode === "copy" && !content.trim())}
               >Continue</button>
             </div>
+            {geminiError && (
+              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{geminiError}</div>
+            )}
+            {loadingGemini && (
+              <div className="flex items-center gap-2 text-blue-600 mb-4">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                Generating suggestions from Gemini...
+              </div>
+            )}
           </div>
         )}
         {/* Step 4: Main Information */}
