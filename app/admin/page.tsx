@@ -16,15 +16,16 @@ const statusColors: Record<string, string> = {
 };
 
 const menuTabs = [
-  { name: "Create" },
-  { name: "Manage" },
-  { name: "Bookings" },
+  { name: "Create", dropdown: ["New Product"] },
+  { name: "Manage", dropdown: ["Products"] },
+  { name: "Bookings", dropdown: ["Bookings"] },
   { name: "Performance" },
   { name: "Finance" },
 ];
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/destinations")
@@ -49,12 +50,31 @@ export default function AdminDashboard() {
           <span className="font-bold text-lg text-blue-600">Admin Panel</span>
           <div className="flex gap-6">
             {menuTabs.map((tab) => (
-              <button
+              <div
                 key={tab.name}
-                className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none"
+                className="relative"
+                onMouseEnter={() => tab.dropdown && setOpenDropdown(tab.name)}
+                onMouseLeave={() => tab.dropdown && setOpenDropdown(null)}
               >
-                {tab.name}
-              </button>
+                <button
+                  className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
+                  onClick={() => tab.dropdown && setOpenDropdown(tab.name)}
+                >
+                  {tab.name}
+                </button>
+                {tab.dropdown && openDropdown === tab.name && (
+                  <div className="absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
+                    {tab.dropdown.map((item) => (
+                      <div
+                        key={item}
+                        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
