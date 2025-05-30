@@ -185,6 +185,12 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const [category, setCategory] = useState("");
   const [contentMode, setContentMode] = useState("copy");
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [referenceCode, setReferenceCode] = useState("");
+  const [shortDesc, setShortDesc] = useState("");
+  const [fullDesc, setFullDesc] = useState("");
+  const [highlights, setHighlights] = useState<string[]>([]);
+  const [highlightInput, setHighlightInput] = useState("");
 
   return (
     <div className="w-full max-w-3xl bg-white rounded shadow p-8 mx-auto">
@@ -346,12 +352,122 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
           </div>
         </div>
       )}
-      {/* Step 4: Placeholder */}
+      {/* Step 4: Main Information */}
       {step === 4 && (
         <div>
           <div className="mb-4 flex items-center gap-2">
             <span className="text-blue-600 font-bold">4</span>
-            <span className="font-semibold">Automated content creator (Coming soon)</span>
+            <span className="font-semibold">Main Information</span>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">What is the customer-facing title of your product?</label>
+            <input
+              className="w-full border rounded px-3 py-2 mb-2"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              maxLength={60}
+              placeholder="e.g. From Phuket: Krabi and Phang Nga Bay Island Hopping Tour"
+            />
+            <div className="text-right text-xs text-gray-500">{title.length} / 60</div>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Create a product reference code <span className="text-xs text-gray-400">(optional)</span></label>
+            <input
+              className="w-full border rounded px-3 py-2 mb-2"
+              value={referenceCode}
+              onChange={e => setReferenceCode(e.target.value)}
+              maxLength={20}
+              placeholder="e.g. HKT0097"
+            />
+            <div className="text-right text-xs text-gray-500">{referenceCode.length} / 20</div>
+          </div>
+          <div className="flex justify-between">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(3)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+              disabled={title.length < 10}
+              onClick={() => setStep(5)}
+            >Continue</button>
+          </div>
+        </div>
+      )}
+      {/* Step 5: Descriptions & Highlights */}
+      {step === 5 && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-blue-600 font-bold">5</span>
+            <span className="font-semibold">Descriptions & Highlights</span>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Introduce your product</label>
+            <input
+              className="w-full border rounded px-3 py-2 mb-2"
+              value={shortDesc}
+              onChange={e => setShortDesc(e.target.value)}
+              maxLength={200}
+              placeholder="Short intro (2-3 sentences)"
+            />
+            <div className="text-right text-xs text-gray-500">{shortDesc.length} / 200</div>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Add a full description</label>
+            <textarea
+              className="w-full border rounded px-3 py-2 mb-2 min-h-[120px]"
+              value={fullDesc}
+              onChange={e => setFullDesc(e.target.value)}
+              maxLength={3000}
+              placeholder="Full description (at least 500 characters)"
+            />
+            <div className="text-right text-xs text-gray-500">{fullDesc.length} / 3000</div>
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Summarize the highlights</label>
+            <input
+              className="w-full border rounded px-3 py-2 mb-2"
+              value={highlightInput}
+              onChange={e => setHighlightInput(e.target.value)}
+              maxLength={80}
+              placeholder="Add a highlight and press Enter"
+              onKeyDown={e => {
+                if (e.key === 'Enter' && highlightInput.trim()) {
+                  setHighlights([...highlights, highlightInput.trim()]);
+                  setHighlightInput("");
+                  e.preventDefault();
+                }
+              }}
+            />
+            <div className="flex flex-wrap gap-2 mb-2">
+              {highlights.map((h, i) => (
+                <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                  {h}
+                  <button type="button" className="ml-1 text-red-500" onClick={() => setHighlights(highlights.filter((_, idx) => idx !== i))}>Remove</button>
+                </span>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">Write 3-5 highlights. Each up to 80 characters.</div>
+          </div>
+          <div className="flex justify-between">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(4)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
+              disabled={shortDesc.length < 20 || fullDesc.length < 500 || highlights.length < 3}
+              onClick={() => setStep(6)}
+            >Continue</button>
+          </div>
+        </div>
+      )}
+      {/* Step 6: Placeholder */}
+      {step === 6 && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-blue-600 font-bold">6</span>
+            <span className="font-semibold">Locations (Coming soon)</span>
           </div>
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700 text-sm mb-4">
             This is a placeholder for the next step. The full step will be implemented next.
@@ -359,7 +475,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
           <div className="flex justify-between">
             <button
               className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(3)}
+              onClick={() => setStep(5)}
             >Back</button>
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
