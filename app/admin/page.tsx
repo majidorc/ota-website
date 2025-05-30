@@ -88,7 +88,7 @@ export default function AdminDashboard() {
               <div
                 key={tab.name}
                 className="relative"
-                ref={el => (dropdownRefs.current[tab.name] = el)}
+                ref={el => { dropdownRefs.current[tab.name] = el; }}
               >
                 <button
                   className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
