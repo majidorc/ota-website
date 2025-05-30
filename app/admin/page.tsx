@@ -507,8 +507,9 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                         body: JSON.stringify({ content })
                       });
                       const data = await res.json();
+                      console.log('Gemini API response:', data);
                       if (data.error) {
-                        setGeminiError("Gemini API error: " + data.error);
+                        setGeminiError("Gemini API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
                         setLoadingGemini(false);
                         return;
                       }
@@ -520,11 +521,11 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                       setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
                       setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
                       setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
-                      setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map(k => k.trim()) : []));
+                      setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map((k: string) => k.trim()) : []));
                       setLoadingGemini(false);
                       setStep(4);
-                    } catch (err) {
-                      setGeminiError("Failed to connect to Gemini API");
+                    } catch (err: any) {
+                      setGeminiError("Failed to connect to Gemini API: " + (err?.message || err));
                       setLoadingGemini(false);
                     }
                   } else {
@@ -626,7 +627,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 {highlights.map((h: string, i: number) => (
                   <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
                     {h}
-                    <button type="button" className="ml-1 text-red-500" onClick={() => setHighlights(highlights.filter((_, idx) => idx !== i))}>Remove</button>
+                    <button type="button" className="ml-1 text-red-500" onClick={(e: MouseEvent<HTMLButtonElement>) => setHighlights(highlights.filter((_, idx) => idx !== i))}>Remove</button>
                   </span>
                 ))}
               </div>
@@ -671,7 +672,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 <button
                   className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
                   type="button"
-                  onClick={() => {
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     if (locationInput.trim()) {
                       setLocations([...locations, locationInput.trim()]);
                       setLocationInput("");
@@ -683,15 +684,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 {locations.map((loc, i) => (
                   <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
                     {loc}
-                    <button type="button" className="ml-1 text-red-500" onClick={() => setLocations(locations.filter((_, idx) => idx !== i))}>Remove</button>
+                    <button type="button" className="ml-1 text-red-500" onClick={(e: MouseEvent<HTMLButtonElement>) => setLocations(locations.filter((_, idx) => idx !== i))}>Remove</button>
                   </span>
                 ))}
               </div>
               <div className="text-xs text-gray-500">Add all relevant locations (e.g., cities, landmarks, meeting points).</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(5)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(5)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(7)}>Continue</button>
             </div>
           </div>
         )}
@@ -722,15 +723,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 {keywords.map((kw, i) => (
                   <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
                     {kw}
-                    <button type="button" className="ml-1 text-red-500" onClick={() => setKeywords(keywords.filter((_, idx) => idx !== i))}>Remove</button>
+                    <button type="button" className="ml-1 text-red-500" onClick={(e: MouseEvent<HTMLButtonElement>) => setKeywords(keywords.filter((_, idx) => idx !== i))}>Remove</button>
                   </span>
                 ))}
               </div>
               <div className="text-xs text-gray-500">Add keywords to help customers find your product.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(6)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(6)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(8)}>Continue</button>
             </div>
           </div>
         )}
@@ -766,8 +767,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-right text-xs text-gray-500">{exclusionsText.length} / 1000</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(7)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(7)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(9)}>Continue</button>
             </div>
           </div>
         )}
@@ -784,7 +785,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={e => {
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   if (e.target.files) {
                     setPhotos([...photos, ...Array.from(e.target.files)]);
                   }
@@ -802,7 +803,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                     <button
                       type="button"
                       className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                      onClick={() => setPhotos(photos.filter((_, idx) => idx !== i))}
+                      onClick={(e: MouseEvent<HTMLButtonElement>) => setPhotos(photos.filter((_, idx) => idx !== i))}
                     >×</button>
                   </div>
                 ))}
@@ -810,8 +811,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500 mt-2">Add high-quality images to attract more bookings.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(8)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(8)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(10)}>Continue</button>
             </div>
           </div>
         )}
@@ -828,21 +829,21 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 <input
                   className="flex-1 border rounded px-3 py-2"
                   value={optionName}
-                  onChange={e => setOptionName(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setOptionName(e.target.value)}
                   maxLength={40}
                   placeholder="Option name"
                 />
                 <input
                   className="flex-1 border rounded px-3 py-2"
                   value={optionDesc}
-                  onChange={e => setOptionDesc(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setOptionDesc(e.target.value)}
                   maxLength={80}
                   placeholder="Description"
                 />
                 <button
                   className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
                   type="button"
-                  onClick={() => {
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     if (optionName.trim()) {
                       setOptions([...options, { name: optionName.trim(), description: optionDesc.trim() }]);
                       setOptionName("");
@@ -856,15 +857,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                   <div key={i} className="flex items-center gap-2 bg-blue-50 rounded px-3 py-2">
                     <span className="font-semibold text-blue-800">{opt.name}</span>
                     <span className="text-gray-600">{opt.description}</span>
-                    <button type="button" className="ml-auto text-red-500" onClick={() => setOptions(options.filter((_, idx) => idx !== i))}>Remove</button>
+                    <button type="button" className="ml-auto text-red-500" onClick={(e: MouseEvent<HTMLButtonElement>) => setOptions(options.filter((_, idx) => idx !== i))}>Remove</button>
                   </div>
                 ))}
               </div>
               <div className="text-xs text-gray-500">Add all available booking options (e.g., Adult, Child, Private Tour).</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(9)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(9)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(11)}>Continue</button>
             </div>
           </div>
         )}
@@ -881,7 +882,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 <input
                   className="flex-1 border rounded px-3 py-2"
                   value={price}
-                  onChange={e => setPrice(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPrice(e.target.value)}
                   maxLength={10}
                   placeholder="Price"
                   type="number"
@@ -890,7 +891,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
                 <select
                   className="border rounded px-3 py-2"
                   value={currency}
-                  onChange={e => setCurrency(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setCurrency(e.target.value)}
                 >
                   <option value="THB">THB</option>
                   <option value="USD">USD</option>
@@ -900,8 +901,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <div className="text-xs text-gray-500">Set the base price and currency for your product.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(10)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(10)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(12)}>Continue</button>
             </div>
           </div>
         )}
@@ -917,14 +918,14 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <input
                 className="w-full border rounded px-3 py-2 mb-2"
                 value={availability}
-                onChange={e => setAvailability(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setAvailability(e.target.value)}
                 placeholder="e.g. Daily, Weekends, 1 Jan - 31 Mar, etc."
               />
               <div className="text-xs text-gray-500">Describe when your product is available for booking.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(11)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(11)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(13)}>Continue</button>
             </div>
           </div>
         )}
@@ -940,15 +941,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <input
                 className="w-full border rounded px-3 py-2 mb-2"
                 value={meetingPoint}
-                onChange={e => setMeetingPoint(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setMeetingPoint(e.target.value)}
                 maxLength={120}
                 placeholder="e.g. Hotel pickup, Main entrance, etc."
               />
               <div className="text-xs text-gray-500">Specify where customers should meet for the activity.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(12)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(12)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(14)}>Continue</button>
             </div>
           </div>
         )}
@@ -964,15 +965,15 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <textarea
                 className="w-full border rounded px-3 py-2 mb-2 min-h-[80px]"
                 value={importantInfo}
-                onChange={e => setImportantInfo(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setImportantInfo(e.target.value)}
                 maxLength={500}
                 placeholder="e.g. Not suitable for children under 6, bring sunscreen, etc."
               />
               <div className="text-xs text-gray-500">Add any important notes or restrictions for customers.</div>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(13)}>Back</button>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => setStep(15)}>Continue</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(13)}>Back</button>
+              <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(15)}>Continue</button>
             </div>
           </div>
         )}
@@ -1006,7 +1007,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               </ul>
             </div>
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={(e: MouseEvent<HTMLButtonElement>) => setStep(14)}>Back</button>
               <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold">Submit</button>
             </div>
           </div>
