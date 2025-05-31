@@ -78,42 +78,45 @@ export default function NewProductForm() {
 
   // Submit handler for step 15
   const handleSubmit = async () => {
+    console.log('Submit clicked');
     setLoading(true);
     setError(null);
     try {
+      const payload = {
+        language,
+        category,
+        title,
+        referenceCode,
+        shortDesc,
+        fullDesc,
+        highlights,
+        locations,
+        keywords,
+        inclusions: inclusionsText,
+        exclusions: exclusionsText,
+        options,
+        price: parseFloat(price),
+        currency,
+        availability,
+        meetingPoint,
+        importantInfo,
+      };
+      console.log('Submitting product:', payload);
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          language,
-          category,
-          title,
-          referenceCode,
-          shortDesc,
-          fullDesc,
-          highlights,
-          locations,
-          keywords,
-          inclusions: inclusionsText,
-          exclusions: exclusionsText,
-          options,
-          price: parseFloat(price),
-          currency,
-          availability,
-          meetingPoint,
-          importantInfo,
-          // photos: photos (handle upload separately if needed)
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Failed to create product");
+        let data;
+        try { data = await res.json(); } catch { data = {}; }
+        setError(data.error || `Failed to create product (status ${res.status})`);
         setLoading(false);
         return;
       }
       router.push("/admin/products");
-    } catch (err) {
-      setError("Failed to create product");
+    } catch (err: any) {
+      setError("Failed to create product: " + (err?.message || err));
       setLoading(false);
     }
   };
