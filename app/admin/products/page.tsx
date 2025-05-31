@@ -4,18 +4,27 @@ import Link from "next/link";
 
 interface Product {
   id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  image: string | null;
-  createdAt: string;
-  updatedAt: string;
+  title: string;
+  referenceCode?: string;
+  shortDesc?: string;
+  photos?: string[];
+  status?: string;
+  price?: number;
+  currency?: string;
 }
+
+const statusColors: Record<string, string> = {
+  Bookable: "bg-green-100 text-green-800",
+  Deactivated: "bg-gray-100 text-gray-800",
+  "Not yet submitted": "bg-yellow-100 text-yellow-800",
+};
 
 export default function ManageProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     fetch("/api/products")
@@ -30,63 +39,84 @@ export default function ManageProducts() {
       });
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-    const res = await fetch("/api/products", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) {
-      setProducts(products.filter(p => p.id !== id));
-    } else {
-      alert("Failed to delete product");
-    }
-  };
+  const filteredProducts = products.filter(product => {
+    const matchesSearch =
+      product.title?.toLowerCase().includes(search.toLowerCase()) ||
+      product.referenceCode?.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter ? product.status === statusFilter : true;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
-      <div className="w-full max-w-4xl bg-white rounded shadow p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Manage Products</h1>
-          <Link href="/admin/products/new" className="bg-blue-600 text-white px-4 py-2 rounded font-semibold">+ Add Product</Link>
+      <div className="w-full max-w-6xl bg-white rounded shadow p-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <h1 className="text-3xl font-bold">Products</h1>
+          <Link href="/admin/products/new" className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">+ Create new product</Link>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Search"
+            className="border rounded px-3 py-2 w-full md:w-64"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <select
+            className="border rounded px-3 py-2 w-full md:w-48"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="">Select Status</option>
+            <option value="Bookable">Bookable</option>
+            <option value="Deactivated">Deactivated</option>
+            <option value="Not yet submitted">Not yet submitted</option>
+          </select>
         </div>
         {loading ? (
           <div>Loading...</div>
         ) : error ? (
           <div className="text-red-600">{error}</div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div>No products found.</div>
         ) : (
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2 border">Name</th>
-                <th className="p-2 border">Description</th>
-                <th className="p-2 border">Price</th>
-                <th className="p-2 border">Image</th>
-                <th className="p-2 border">Actions</th>
+              <tr className="bg-gray-100 text-left">
+                <th className="p-3">Product</th>
+                <th className="p-3">Reference code</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Price</th>
+                <th className="p-3">Action</th>
               </tr>
             </thead>
             <tbody>
-              {products.map(product => (
-                <tr key={product.id} className="border-b">
-                  <td className="p-2 border font-semibold">{product.name}</td>
-                  <td className="p-2 border">{product.description}</td>
-                  <td className="p-2 border">${product.price.toFixed(2)}</td>
-                  <td className="p-2 border">
-                    {product.image ? (
-                      <img src={product.image} alt={product.name} className="h-12 w-12 object-cover rounded" />
-                    ) : (
-                      <span className="text-gray-400">No image</span>
-                    )}
+              {filteredProducts.map(product => (
+                <tr key={product.id} className="border-b hover:bg-gray-50">
+                  <td className="flex items-center gap-4 py-4">
+                    <img
+                      src={product.photos && product.photos.length > 0 ? product.photos[0] : "/images/placeholder.jpg"}
+                      alt={product.title}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div>
+                      <div className="font-semibold">{product.title}</div>
+                      <div className="text-xs text-gray-500">{product.shortDesc}</div>
+                    </div>
                   </td>
-                  <td className="p-2 border">
-                    {/* Add edit link if needed */}
-                    <button
-                      className="text-red-600 hover:underline ml-2"
-                      onClick={() => handleDelete(product.id)}
-                    >Delete</button>
+                  <td className="text-center">{product.referenceCode || "-"}</td>
+                  <td>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[product.status || "Not yet submitted"] || "bg-gray-100 text-gray-800"}`}>
+                      {product.status || "Not yet submitted"}
+                    </span>
+                  </td>
+                  <td>
+                    {typeof product.price === 'number' && !isNaN(product.price)
+                      ? `${product.price.toFixed(2)} ${product.currency || ''}`
+                      : "-"}
+                  </td>
+                  <td>
+                    <Link href={`/admin/products/${product.id}`} className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">See details</Link>
                   </td>
                 </tr>
               ))}
