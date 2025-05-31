@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Define the interface for the suggestions object
+interface ContentSuggestions {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  category?: string;
+  difficulty?: string;
+  duration?: number;
+  priceRange?: string;
+  location?: string;
+  bestTimeToVisit?: string;
+  requiredItems?: string;
+  safetyTips?: string[];
+  accessibility?: string;
+  environmentalImpact?: string;
+  localCustoms?: string[];
+  photographyTips?: string[];
+  transportation?: string;
+  bookingRequirements?: string;
+  groupSize?: string;
+  language?: string;
+  weatherConsiderations?: string[];
+}
+
 export async function POST(req: NextRequest) {
   const { content } = await req.json();
   if (!content) {
@@ -117,7 +141,7 @@ Activity Description:
 
   const generatedText = data.choices?.[0]?.message?.content || "";
 
-  let suggestions = {};
+  let suggestions: ContentSuggestions = {};
   try {
     suggestions = JSON.parse(generatedText);
   } catch (e) {
