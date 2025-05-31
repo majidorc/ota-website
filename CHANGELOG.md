@@ -1,6 +1,7 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.0] - 2024-05-31
+- First stable release with all admin features and product management.
 - Refactor: Removed duplicate New Product forms. Only the form accessible via Admin → Create → New Product remains.
 - Feature: 15-step multi-step product creation flow with sidebar navigation.
 - Fix: Product creation now saves all fields to the database.

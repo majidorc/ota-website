@@ -1,6 +1,12 @@
-# OTA Website
+# OTA Website ![version](https://img.shields.io/badge/version-v1.0.0-blue)
 
 This is a Next.js application for managing products, bookings, and more, using a Neon Postgres database.
+
+## Version
+
+Current version: **v1.0.0**
+
+See [CHANGELOG.md](./CHANGELOG.md) for all major changes.
 
 ## Features
 - Multi-step product creation form (15 steps)
