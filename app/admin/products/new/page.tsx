@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 
 const languages = ["English", "French", "German", "Spanish", "Italian", "Thai"];
@@ -13,20 +13,71 @@ const categories = [
   { label: "Other", description: "Like a cooking class or multiple activities sold together" },
 ];
 
-export default function NewProduct() {
-  const [step, setStep] = useState(1);
-  const [language, setLanguage] = useState("");
-  const [category, setCategory] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
+export default function NewProductForm() {
+  const [step, setStep] = useState<number>(1);
+  const [language, setLanguage] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [contentMode, setContentMode] = useState<string>("copy");
+  const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [referenceCode, setReferenceCode] = useState<string>("");
+  const [shortDesc, setShortDesc] = useState<string>("");
+  const [fullDesc, setFullDesc] = useState<string>("");
+  const [highlights, setHighlights] = useState<string[]>([]);
+  const [highlightInput, setHighlightInput] = useState<string>("");
+  const [locations, setLocations] = useState<string[]>([]);
+  const [locationInput, setLocationInput] = useState<string>("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState<string>("");
+  const [inclusionsText, setInclusionsText] = useState<string>("");
+  const [exclusionsText, setExclusionsText] = useState<string>("");
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [options, setOptions] = useState<{ name: string; description: string }[]>([]);
+  const [optionName, setOptionName] = useState("");
+  const [optionDesc, setOptionDesc] = useState("");
+  const [price, setPrice] = useState<string>("");
+  const [currency, setCurrency] = useState<string>("THB");
+  const [availability, setAvailability] = useState<string>("");
+  const [meetingPoint, setMeetingPoint] = useState<string>("");
+  const [importantInfo, setImportantInfo] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const steps = [
+    { label: "Product Language" },
+    { label: "Product Category" },
+    { label: "Automated Content Creator" },
+    { label: "Main Information" },
+    { label: "Descriptions & Highlights" },
+    { label: "Locations" },
+    { label: "Keywords" },
+    { label: "Inclusions & Exclusions" },
+    { label: "Photos" },
+    { label: "Options" },
+    { label: "Pricing" },
+    { label: "Availability" },
+    { label: "Meeting Point" },
+    { label: "Important Info" },
+    { label: "Review & Submit" },
+  ];
+
+  // Keyboard navigation for steps
+  useEffect(() => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (step < steps.length) setStep(step + 1);
+      } else if (e.key === 'ArrowLeft') {
+        if (step > 1) setStep(step - 1);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, steps.length]);
+
+  // Submit handler for step 15
+  const handleSubmit = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -34,12 +85,24 @@ export default function NewProduct() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          description,
-          price: parseFloat(price),
-          image,
           language,
           category,
+          title,
+          referenceCode,
+          shortDesc,
+          fullDesc,
+          highlights,
+          locations,
+          keywords,
+          inclusions: inclusionsText,
+          exclusions: exclusionsText,
+          options,
+          price: parseFloat(price),
+          currency,
+          availability,
+          meetingPoint,
+          importantInfo,
+          // photos: photos (handle upload separately if needed)
         }),
       });
       if (!res.ok) {
@@ -55,16 +118,55 @@ export default function NewProduct() {
     }
   };
 
+  // Sidebar navigation handler
+  const handleSidebarClick = (idx: number) => {
+    if (idx + 1 < step) setStep(idx + 1);
+  };
+
+  // Hotkey hints
+  const HotkeyHint = () => (
+    <div className="text-xs text-gray-500 mt-2">
+      <span className="bg-gray-100 px-2 py-1 rounded mr-2">←</span> Previous step
+      <span className="bg-gray-100 px-2 py-1 rounded mx-2">→</span> Next step
+      <span className="bg-gray-100 px-2 py-1 rounded ml-2">Enter</span> Continue
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
-      <div className="w-full max-w-3xl bg-white rounded shadow p-8">
-        <h1 className="text-2xl font-bold mb-6">Create a new product</h1>
+    <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r bg-gray-50 p-4 md:p-6 sticky top-0 h-auto md:h-full">
+        <nav id="sidebar-steps" className={`md:block transition-all duration-200`}>
+          <ul className="space-y-2">
+            {steps.map((s, idx) => (
+              <li key={s.label}>
+                <button
+                  className={`w-full text-left px-4 py-2 rounded font-medium transition-colors
+                    ${step === idx + 1 ? 'bg-blue-600 text-white' : idx + 1 < step ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-400 cursor-not-allowed'}`}
+                  disabled={idx + 1 > step}
+                  onClick={() => handleSidebarClick(idx)}
+                >
+                  <span className="mr-2 font-bold">{idx + 1}.</span> {s.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+      {/* Form Content */}
+      <div className="flex-1 p-8">
+        <h1 className="text-xl font-bold mb-6">Create a new product</h1>
         {/* Progress bar */}
         <div className="flex items-center mb-8">
-          <div className={`flex-1 h-1 rounded ${step >= 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-          <div className={`flex-1 h-1 rounded mx-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-          <div className={`flex-1 h-1 rounded ${step >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+          {steps.map((_, idx) => (
+            <div
+              key={idx}
+              className={`flex-1 h-1 rounded ${step > idx ? 'bg-blue-600' : 'bg-gray-200'} ${idx !== 0 ? 'mx-1' : ''}`}
+            ></div>
+          ))}
         </div>
+        {/* Add hotkey hints */}
+        <HotkeyHint />
         {/* Step 1: Language */}
         {step === 1 && (
           <div>
@@ -150,17 +252,35 @@ export default function NewProduct() {
               <label className="block font-semibold mb-1">Product Name</label>
               <input
                 className="w-full border rounded px-3 py-2"
-                value={name}
-                onChange={e => setName(e.target.value)}
+                value={title}
+                onChange={e => setTitle(e.target.value)}
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Description</label>
+              <label className="block font-semibold mb-1">Reference Code</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={referenceCode}
+                onChange={e => setReferenceCode(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Short Description</label>
               <textarea
                 className="w-full border rounded px-3 py-2"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
+                value={shortDesc}
+                onChange={e => setShortDesc(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Full Description</label>
+              <textarea
+                className="w-full border rounded px-3 py-2"
+                value={fullDesc}
+                onChange={e => setFullDesc(e.target.value)}
                 required
               />
             </div>
@@ -177,12 +297,18 @@ export default function NewProduct() {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-1">Image URL</label>
-              <input
+              <label className="block font-semibold mb-1">Currency</label>
+              <select
                 className="w-full border rounded px-3 py-2"
-                value={image}
-                onChange={e => setImage(e.target.value)}
-              />
+                value={currency}
+                onChange={e => setCurrency(e.target.value)}
+              >
+                <option value="THB">THB</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+              </select>
             </div>
             {error && <div className="text-red-600 mb-4">{error}</div>}
             <div className="flex justify-between">
@@ -195,10 +321,48 @@ export default function NewProduct() {
               <button
                 type="submit"
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={loading || !name || !description || !price}
+                disabled={loading || !title || !referenceCode || !shortDesc || !fullDesc || !price}
               >{loading ? "Submitting..." : "Add Product"}</button>
             </div>
           </form>
+        )}
+        {/* Step 15: Review & Submit */}
+        {step === 15 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">15</span>
+              <span className="font-semibold">Review & Submit</span>
+            </div>
+            <div className="mb-4">
+              <h2 className="font-bold mb-2">Review your product details</h2>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li><b>Language:</b> {language}</li>
+                <li><b>Category:</b> {category}</li>
+                <li><b>Title:</b> {title}</li>
+                <li><b>Reference Code:</b> {referenceCode}</li>
+                <li><b>Short Description:</b> {shortDesc}</li>
+                <li><b>Full Description:</b> {fullDesc}</li>
+                <li><b>Highlights:</b> {highlights.join(", ")}</li>
+                <li><b>Locations:</b> {locations.join(", ")}</li>
+                <li><b>Keywords:</b> {keywords.join(", ")}</li>
+                <li><b>Inclusions:</b> {inclusionsText}</li>
+                <li><b>Exclusions:</b> {exclusionsText}</li>
+                <li><b>Options:</b> {options.map(o => o.name).join(", ")}</li>
+                <li><b>Price:</b> {price} {currency}</li>
+                <li><b>Availability:</b> {availability}</li>
+                <li><b>Meeting Point:</b> {meetingPoint}</li>
+                <li><b>Important Info:</b> {importantInfo}</li>
+                <li><b>Photos:</b> {photos.length} uploaded</li>
+              </ul>
+            </div>
+            {error && <div className="text-red-600 mb-4">{error}</div>}
+            <div className="flex justify-between">
+              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
+              <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold" onClick={handleSubmit} disabled={loading}>
+                {loading ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
