@@ -35,6 +35,13 @@ export default function Home() {
       })
   }, [])
 
+  function toKebabCase(str: string) {
+    return str && str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+  }
+
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Top Navigation Bar */}
@@ -164,28 +171,33 @@ export default function Home() {
           <div className="text-center py-8">No products available at the moment.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div className="relative h-40 w-full">
-                  <Image 
-                    src={product.photos && product.photos.length > 0 ? product.photos[0] : '/images/placeholder.jpg'} 
-                    alt={product.title} 
-                    fill 
-                    className="object-cover rounded-t-lg" 
-                  />
+            {products.map((product) => {
+              const slug = `${toKebabCase(product.title || 'product')}-${product.id}`;
+              return (
+                <div key={product.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+                  <a href={`/tours/${slug}`}>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src={product.photos && product.photos.length > 0 ? product.photos[0] : '/images/placeholder.jpg'} 
+                        alt={product.title} 
+                        fill 
+                        className="object-cover rounded-t-lg" 
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="text-xs text-gray-500 mb-1">{product.category || 'Product'}</div>
+                      <div className="font-semibold mb-1">{product.title}</div>
+                      <div className="text-xs text-gray-600 mb-2">{product.shortDesc}</div>
+                      <div className="text-xs text-gray-500">
+                        From <span className="font-bold">
+                          {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}` : 'Contact for price'}
+                        </span> per person
+                      </div>
+                    </div>
+                  </a>
                 </div>
-                <div className="p-4">
-                  <div className="text-xs text-gray-500 mb-1">{product.category || 'Product'}</div>
-                  <div className="font-semibold mb-1">{product.title}</div>
-                  <div className="text-xs text-gray-600 mb-2">{product.shortDesc}</div>
-                  <div className="text-xs text-gray-500">
-                    From <span className="font-bold">
-                      {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}` : 'Contact for price'}
-                    </span> per person
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
