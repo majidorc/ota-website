@@ -1,15 +1,13 @@
 # OTA Website
 
-A modern Online Travel Agency website built with Next.js, Prisma, and PostgreSQL.
+This is a Next.js application for managing products, bookings, and more, using a Neon Postgres database.
 
 ## Features
-
-- Activity management system
-- Booking system
-- User authentication
+- Multi-step product creation form (15 steps)
+- Product management (CRUD)
+- Neon Postgres integration (via `pg`)
 - Admin dashboard
-- AI-powered content generation
-- Responsive design
+- Modern UI/UX
 
 ## Tech Stack
 
@@ -23,61 +21,48 @@ A modern Online Travel Agency website built with Next.js, Prisma, and PostgreSQL
 
 ## Getting Started
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/ota-website.git
-   cd ota-website
-   ```
+### 1. Clone the repository
+```sh
+git clone https://github.com/majidorc/ota-website.git
+cd ota-website
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### 2. Install dependencies
+```sh
+yarn install
+```
 
-3. Set up environment variables:
-   - Create a `.env` file in the root directory
-   - Add the following variables:
-     ```
-     DATABASE_URL="your-neon-database-url"
-     NEXTAUTH_URL="http://localhost:3000"
-     NEXTAUTH_SECRET="your-secret-key"
-     OPENAI_API_KEY="your-openai-api-key"
-     ```
+### 3. Set up environment variables
+Create a `.env` file with your Neon Postgres connection string:
+```
+DATABASE_URL=your_neon_postgres_url
+```
 
-4. Set up the database:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   npx prisma db seed
-   ```
+### 4. Run migrations
+- Run the SQL files in the `migrations/` directory on your Neon database (via the Neon dashboard or `psql`).
+- Example:
+  - `migrations/001_create_product_table.sql` (creates the Product table)
+  - `migrations/002_alter_product_table.sql` (adds all product fields)
 
-5. Run the development server:
-   ```bash
-   npm run dev
-   ```
+### 5. Start the development server
+```sh
+yarn dev
+```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+## Product Creation Flow
+- Go to **Admin → Create → New Product**
+- Fill out the 15-step multi-step form
+- All product details are saved to the database
+- Only one product creation form is active (no duplicates)
 
-## Database Setup
-
-1. Create a free account at [Neon](https://neon.tech)
-2. Create a new project
-3. Get your connection string from the dashboard
-4. Add it to your `.env` file as `DATABASE_URL`
+## API
+- Product CRUD: `/api/products`
+- Bookings: `/api/bookings`
+- Activities: `/api/activities`
 
 ## Deployment
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy!
-
-## Admin Access
-
-Default admin credentials:
-- Email: admin@example.com
-- Password: admin123
+- Deploys automatically to Vercel on push to `main`
+- Make sure to run migrations on Neon when you change the database schema
 
 ## License
-
 MIT 
