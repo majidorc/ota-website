@@ -25,4 +25,19 @@
 - Product ID is now a string in the format YYMMDD01 (date-based, unique, not editable) and used as the primary key for new products.
 - Reference code is now optional, editable, and not unique.
 - Added migration to change the id column type in the Product table.
+- Product creation API now generates the new ID format automatically.
+- All product database fields are now lowercase (e.g. shortdesc, fulldesc, meetingpoint, importantinfo) for SQL and code consistency.
+- Product creation and edit APIs now properly parse and stringify JSON fields (highlights, locations, keywords, options).
+- Product creation API now retries with the next counter if a duplicate product ID is detected, ensuring unique IDs even with concurrent creation.
+- Fixed: `.slice is not a function` and other errors caused by type mismatches in product creation.
+- Fixed: PATCH and POST handlers now use lowercase and correct field names everywhere.
+- Improved: ChatGPT autofill in the new product form now fills all possible fields and steps, not just a subset.
+- Fixed: Build errors related to const/let and import paths.
+- General bugfixes and codebase cleanup for full lowercase SQL and robust product management.
+
+## [Unreleased]
+### Changed
+- Product ID is now a string in the format YYMMDD01 (date-based, unique, not editable) and used as the primary key for new products.
+- Reference code is now optional, editable, and not unique.
+- Added migration to change the id column type in the Product table.
 - Product creation API now generates the new ID format automatically. 
