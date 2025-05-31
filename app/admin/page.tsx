@@ -299,7 +299,7 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
 
   // Add keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       // Only handle keyboard navigation when not in an input or textarea
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
