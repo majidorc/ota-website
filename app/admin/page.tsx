@@ -97,11 +97,7 @@ export default function AdminDashboard() {
   const handleNavigation = (href: string) => {
     setOpenDropdown(null);
     setMobileMenuOpen(false);
-    if (href === '/admin/products/new') {
-      setShowNewProductForm(true);
-    } else {
-      router.push(href);
-    }
+    router.push(href);
   };
 
   return (
@@ -219,11 +215,6 @@ export default function AdminDashboard() {
 
           {/* Main Content */}
           <div className="mt-8">
-            {showNewProductForm && (
-              <div className="mb-8">
-                <NewProductForm onClose={() => setShowNewProductForm(false)} />
-              </div>
-            )}
             <h1 className="text-2xl font-bold mb-6">Products</h1>
             <div className="overflow-x-auto bg-white rounded shadow">
               <table className="min-w-full divide-y divide-gray-200">
