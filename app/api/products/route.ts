@@ -53,12 +53,12 @@ export async function POST(request: Request) {
     const referenceCode = formData.get('referenceCode') as string;
     const shortDesc = formData.get('shortDesc') as string;
     const fullDesc = formData.get('fullDesc') as string;
-    const highlights = JSON.parse(formData.get('highlights') as string);
-    const locations = JSON.parse(formData.get('locations') as string);
-    const keywords = JSON.parse(formData.get('keywords') as string);
+    const highlights = formData.get('highlights') as string;
+    const locations = formData.get('locations') as string;
+    const keywords = formData.get('keywords') as string;
     const inclusions = formData.get('inclusions') as string;
     const exclusions = formData.get('exclusions') as string;
-    const options = JSON.parse(formData.get('options') as string);
+    const options = formData.get('options') as string;
     const price = parseFloat(formData.get('price') as string);
     const currency = formData.get('currency') as string;
     const availability = formData.get('availability') as string;
@@ -94,9 +94,16 @@ export async function POST(request: Request) {
       RETURNING id`,
       [
         language, category, title, referenceCode, shortDesc,
-        fullDesc, highlights, locations, keywords, inclusions,
-        exclusions, options, price, currency, availability,
-        meetingPoint, importantInfo, photoUrls
+        fullDesc,
+        highlights ? highlights : '[]',
+        locations ? locations : '[]',
+        keywords ? keywords : '[]',
+        inclusions,
+        exclusions,
+        options ? options : '[]',
+        price, currency, availability,
+        meetingPoint, importantInfo,
+        JSON.stringify(photoUrls)
       ]
     );
 
