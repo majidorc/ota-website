@@ -84,7 +84,7 @@ Activity Description:
         "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "user",
@@ -92,20 +92,27 @@ Activity Description:
           },
         ],
         temperature: 0.7,
-        max_tokens: 8192,
+        max_tokens: 4000,
       }),
     }
   );
 
-  if (!response.ok) {
-    const error = await response.text();
-    return NextResponse.json({ error }, { status: response.status });
-  }
-
-  const data = await response.json();
-  if (!response.ok) {
-    console.error("OpenAI API error:", data);
-    return NextResponse.json({ error: data.error?.message || "Failed to generate content" }, { status: response.status });
+  let data;
+  try {
+    data = await response.json();
+    if (!response.ok) {
+      console.error("OpenAI API error:", data);
+      return NextResponse.json(
+        { error: data.error?.message || "Failed to generate content" },
+        { status: response.status }
+      );
+    }
+  } catch (error) {
+    console.error("Failed to parse OpenAI response:", error);
+    return NextResponse.json(
+      { error: "Failed to parse OpenAI API response" },
+      { status: 500 }
+    );
   }
 
   const generatedText = data.choices?.[0]?.message?.content || "";
@@ -114,7 +121,11 @@ Activity Description:
   try {
     suggestions = JSON.parse(generatedText);
   } catch (e) {
-    suggestions = { error: 'Failed to parse OpenAI response', raw: generatedText };
+    console.error("Failed to parse generated content:", e);
+    return NextResponse.json(
+      { error: "Failed to parse generated content", raw: generatedText },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json(suggestions);
