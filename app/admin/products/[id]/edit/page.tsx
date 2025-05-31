@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import EditProductForm from "../../../components/EditProductForm";
+import EditProductForm from "../../../../components/EditProductForm";
 
 export default function EditProduct({ params }: { params: { id: string } }) {
   return (
