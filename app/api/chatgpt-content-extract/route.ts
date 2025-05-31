@@ -128,5 +128,23 @@ Activity Description:
     );
   }
 
-  return NextResponse.json(suggestions);
+  // Map the response to match the form fields exactly
+  const mappedResponse = {
+    title: suggestions.title || "",
+    shortDescription: suggestions.description || "",
+    fullDescription: `${suggestions.description}\n\n${suggestions.safetyTips?.join("\n") || ""}\n\n${suggestions.localCustoms?.join("\n") || ""}\n\n${suggestions.photographyTips?.join("\n") || ""}\n\n${suggestions.weatherConsiderations?.join("\n") || ""}`,
+    highlights: [
+      suggestions.category,
+      suggestions.difficulty,
+      suggestions.priceRange,
+      suggestions.accessibility,
+      suggestions.groupSize
+    ].filter(Boolean),
+    inclusions: suggestions.requiredItems?.split(",").map((item: string) => item.trim()) || [],
+    exclusions: [],
+    locations: [suggestions.location].filter(Boolean),
+    keywords: suggestions.keywords?.split(",").map((kw: string) => kw.trim()) || [],
+  };
+
+  return NextResponse.json(mappedResponse);
 } 
