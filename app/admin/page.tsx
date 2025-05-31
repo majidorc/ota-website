@@ -269,9 +269,9 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   // Step 15: Important Info
   const [importantInfo, setImportantInfo] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  // Gemini loading and error state
-  const [loadingGemini, setLoadingGemini] = useState(false);
-  const [geminiError, setGeminiError] = useState<string | null>(null);
+  // ChatGPT loading and error state
+  const [loadingChatGPT, setLoadingChatGPT] = useState(false);
+  const [chatGPTError, setChatGPTError] = useState<string | null>(null);
 
   // Steps definition
   const steps = [
@@ -296,6 +296,40 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
   const handleSidebarClick = (idx: number) => {
     if (idx + 1 < step) setStep(idx + 1);
   };
+
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard navigation when not in an input or textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        // Move to next step if not on last step
+        if (step < steps.length) {
+          setStep(step + 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        // Move to previous step if not on first step
+        if (step > 1) {
+          setStep(step - 1);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, steps.length]);
+
+  // Add hotkey hints component
+  const HotkeyHint = () => (
+    <div className="text-xs text-gray-500 mt-2">
+      <span className="bg-gray-100 px-2 py-1 rounded mr-2">←</span> Previous step
+      <span className="bg-gray-100 px-2 py-1 rounded mx-2">→</span> Next step
+      <span className="bg-gray-100 px-2 py-1 rounded ml-2">Enter</span> Continue
+    </div>
+  );
 
   return (
     <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
@@ -344,6 +378,8 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
             ></div>
           ))}
         </div>
+        {/* Add hotkey hints */}
+        <HotkeyHint />
         {/* Step 1: Language */}
         {step === 1 && (
           <div>
@@ -488,51 +524,53 @@ function NewProductForm({ onCancel }: { onCancel: () => void }) {
               <button
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
                 onClick={async () => {
-                  setGeminiError(null);
+                  setChatGPTError(null);
                   if (contentMode === "copy" && content.trim()) {
-                    setLoadingGemini(true);
+                    setLoadingChatGPT(true);
                     try {
-                      const res = await fetch("/api/gemini-content-extract", {
+                      const res = await fetch("/api/chatgpt-content-extract", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ content })
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ content }),
                       });
+
                       const data = await res.json();
-                      console.log('Gemini API response:', data);
+                      console.log('ChatGPT API response:', data);
+
                       if (data.error) {
-                        setGeminiError("Gemini API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
-                        setLoadingGemini(false);
-                        return;
+                        setChatGPTError("ChatGPT API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
+                      } else {
+                        setTitle(data.title || "");
+                        setShortDesc(data.shortDescription || "");
+                        setFullDesc(data.fullDescription || "");
+                        setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
+                        setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
+                        setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
+                        setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
+                        setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map((k: string) => k.trim()) : []));
+                        setLoadingChatGPT(false);
+                        setStep(4);
                       }
-                      // Fill next steps with suggestions
-                      setTitle(data.title || "");
-                      setShortDesc(data.shortDescription || "");
-                      setFullDesc(data.fullDescription || "");
-                      setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
-                      setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
-                      setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
-                      setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
-                      setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map((k: string) => k.trim()) : []));
-                      setLoadingGemini(false);
-                      setStep(4);
                     } catch (err: any) {
-                      setGeminiError("Failed to connect to Gemini API: " + (err?.message || err));
-                      setLoadingGemini(false);
+                      setChatGPTError("Failed to connect to ChatGPT API: " + (err?.message || err));
+                    } finally {
+                      setLoadingChatGPT(false);
                     }
                   } else {
                     setStep(4);
                   }
                 }}
-                disabled={loadingGemini || (contentMode === "copy" && !content.trim())}
+                disabled={loadingChatGPT || (contentMode === "copy" && !content.trim())}
               >Continue</button>
             </div>
-            {geminiError && (
-              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{geminiError}</div>
+            {chatGPTError && (
+              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{chatGPTError}</div>
             )}
-            {loadingGemini && (
-              <div className="flex items-center gap-2 text-blue-600 mb-4">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                Generating suggestions from Gemini...
+            {loadingChatGPT && (
+              <div className="bg-blue-100 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                Generating suggestions from ChatGPT...
               </div>
             )}
           </div>
