@@ -25,6 +25,13 @@ export async function GET(
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
     const data = await request.json();
+    // Stringify JSON fields if present
+    const jsonFields = ["highlights", "locations", "keywords", "options"];
+    for (const field of jsonFields) {
+      if (field in data && typeof data[field] !== "string") {
+        data[field] = JSON.stringify(data[field]);
+      }
+    }
     const fields = [];
     const values = [];
     let idx = 1;
