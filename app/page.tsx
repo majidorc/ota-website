@@ -1,12 +1,27 @@
 "use client";
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import SearchBar from './components/SearchBar'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('For you')
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const tabs = ['For you', 'Culture', 'Food', 'Nature']
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to load products:', err)
+        setLoading(false)
+      })
+  }, [])
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -127,6 +142,40 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </section>
+      {/* Products Section */}
+      <section className="py-10 px-4 md:px-16">
+        <h2 className="text-2xl font-bold mb-6">Our Products</h2>
+        {loading ? (
+          <div className="text-center py-8">Loading products...</div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-8">No products available at the moment.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <div key={product.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+                <div className="relative h-40 w-full">
+                  <Image 
+                    src={product.photos && product.photos.length > 0 ? product.photos[0] : '/images/placeholder.jpg'} 
+                    alt={product.title} 
+                    fill 
+                    className="object-cover rounded-t-lg" 
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-gray-500 mb-1">{product.category || 'Product'}</div>
+                  <div className="font-semibold mb-1">{product.title}</div>
+                  <div className="text-xs text-gray-600 mb-2">{product.shortDesc}</div>
+                  <div className="text-xs text-gray-500">
+                    From <span className="font-bold">
+                      {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}` : 'Contact for price'}
+                    </span> per person
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
       {/* Footer */}
       <footer className="bg-gray-50 py-10 px-4 md:px-16 mt-10 border-t">
