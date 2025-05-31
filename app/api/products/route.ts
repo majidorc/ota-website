@@ -30,7 +30,7 @@ interface Product {
 // GET /api/products - List all products
 export async function GET() {
   try {
-    const result = await pool.query('SELECT * FROM "Product" ORDER BY "createdAt" DESC');
+    const result = await pool.query('SELECT * FROM product ORDER BY createdAt DESC');
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
     // Insert into database
     const result = await pool.query(
-      `INSERT INTO "Product" (
+      `INSERT INTO product (
         language, category, title, referenceCode, shortDesc,
         fullDesc, highlights, locations, keywords, inclusions,
         exclusions, options, price, currency, availability,
