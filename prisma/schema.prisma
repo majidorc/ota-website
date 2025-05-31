@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  bookings      Booking[]
+  reviews       Review[]
+  wishlist      Activity[] @relation("UserWishlist")
+}
+
+model Activity {
+  id              String    @id @default(cuid())
+  title           String
+  shortDescription String
+  fullDescription String
+  highlights      String[]
+  inclusions      String[]
+  exclusions      String[]
+  locations       String[]
+  keywords        String[]
+  price           Float
+  duration        Int       // in hours
+  maxGroupSize    Int
+  minAge          Int?
+  difficulty      Difficulty
+  category        Category
+  status          Status    @default(DRAFT)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+  reviews         Review[]
+  wishlistedBy    User[]    @relation("UserWishlist")
+  images          Image[]
+  schedules       Schedule[]
+}
+
+model Booking {
+  id          String    @id @default(cuid())
+  userId      String
+  activityId  String
+  scheduleId  String
+  status      BookingStatus @default(PENDING)
+  participants Int
+  totalPrice  Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  activity    Activity  @relation(fields: [activityId], references: [id])
+  schedule    Schedule  @relation(fields: [scheduleId], references: [id])
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  userId      String
+  activityId  String
+  rating      Int
+  comment     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  activity    Activity  @relation(fields: [activityId], references: [id])
+}
+
+model Image {
+  id          String    @id @default(cuid())
+  url         String
+  alt         String?
+  activityId  String
+  createdAt   DateTime  @default(now())
+  activity    Activity  @relation(fields: [activityId], references: [id])
+}
+
+model Schedule {
+  id          String    @id @default(cuid())
+  activityId  String
+  startTime   DateTime
+  endTime     DateTime
+  maxCapacity Int
+  currentBookings Int @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  activity    Activity  @relation(fields: [activityId], references: [id])
+  bookings    Booking[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MODERATE
+  CHALLENGING
+}
+
+enum Category {
+  ADVENTURE
+  CULTURAL
+  NATURE
+  URBAN
+  RELAXATION
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+} 
