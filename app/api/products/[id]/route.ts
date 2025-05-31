@@ -20,4 +20,29 @@ export async function GET(
     console.error("Error fetching product:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
+}
+
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const data = await request.json();
+    const fields = [];
+    const values = [];
+    let idx = 1;
+    for (const key in data) {
+      fields.push(`"${key}" = $${idx++}`);
+      values.push(data[key]);
+    }
+    values.push(params.id);
+    const res = await pool.query(
+      `UPDATE product SET ${fields.join(', ')}, updatedat = NOW() WHERE id = $${idx} RETURNING *`,
+      values
+    );
+    if (!res.rows[0]) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    return NextResponse.json(res.rows[0]);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
+  }
 } 
