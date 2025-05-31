@@ -16,7 +16,7 @@ import {
 interface Product {
   id: string;
   title: string;
-  referenceCode?: string;
+  referencecode?: string;
   shortDesc?: string;
   longDesc?: string;
   photos?: string[];
@@ -118,7 +118,7 @@ export default function ProductDetails({ params }: { params: { id: string } }) {
             </div>
             <div className="text-sm text-gray-500 flex gap-2 mt-1">
               <span>Product #{product.id}</span>
-              {product.referenceCode && <span>Product Reference Code: {product.referenceCode}</span>}
+              {product.referencecode && <span>Product Reference Code: {product.referencecode}</span>}
               {/* <span>Rating: ★★★★☆ 4.8 (200+ reviews)</span> */}
             </div>
           </div>

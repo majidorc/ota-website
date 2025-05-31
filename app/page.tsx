@@ -7,7 +7,7 @@ import SearchBar from './components/SearchBar'
 interface Product {
   id: string;
   title: string;
-  referenceCode?: string;
+  referencecode?: string;
   shortDesc?: string;
   photos?: string[];
   status?: string;

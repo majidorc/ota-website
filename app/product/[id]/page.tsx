@@ -19,29 +19,16 @@ interface Product {
   notAvailableFor?: string;
   meetingPoint?: string;
   importantInfo?: string;
-  options?: { name: string; description: string }[];
-}
-
-function extractIdFromSlug(slug: string): string | null {
-  // Slug format: title-in-kebab-case-id
-  const match = slug.match(/-(\w+)$/);
-  return match ? match[1] : null;
 }
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const { slug } = params as { slug: string };
-  const id = extractIdFromSlug(slug);
+  const { id } = params;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
-      setError("Invalid product URL");
-      setLoading(false);
-      return;
-    }
     fetch(`/api/products/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Product not found");
@@ -130,20 +117,6 @@ export default function ProductDetailPage() {
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-2">Important information</h2>
             <p className="text-gray-700">{product.importantInfo}</p>
-          </div>
-        )}
-        {/* Options Section */}
-        {product.options && product.options.length > 0 && (
-          <div className="mb-6">
-            <h2 className="font-bold text-lg mb-2">Options</h2>
-            <div className="space-y-2">
-              {product.options.map((option, idx) => (
-                <div key={idx} className="border rounded p-4 bg-gray-50">
-                  <div className="font-semibold">{option.name}</div>
-                  <div className="text-gray-700 text-sm">{option.description}</div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
         {/* Placeholder for related products or recommendations */}

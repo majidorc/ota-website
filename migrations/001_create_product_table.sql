@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "Product" (
+CREATE TABLE IF NOT EXISTS product (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
   description TEXT,

@@ -20,7 +20,7 @@ export default function NewProductForm() {
   const [contentMode, setContentMode] = useState<string>("copy");
   const [content, setContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [referenceCode, setReferenceCode] = useState<string>("");
+  const [referencecode, setReferencecode] = useState<string>("");
   const [shortDesc, setShortDesc] = useState<string>("");
   const [fullDesc, setFullDesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
@@ -88,7 +88,7 @@ export default function NewProductForm() {
       formData.append('language', language);
       formData.append('category', category);
       formData.append('title', title);
-      formData.append('referenceCode', referenceCode);
+      formData.append('referencecode', referencecode);
       formData.append('shortDesc', shortDesc);
       formData.append('fullDesc', fullDesc);
       formData.append('highlights', JSON.stringify(highlights));
@@ -387,8 +387,8 @@ export default function NewProductForm() {
                 <input
                   type="text"
                   className="w-full border rounded px-3 py-2"
-                  value={referenceCode}
-                  onChange={(e) => setReferenceCode(e.target.value)}
+                  value={referencecode}
+                  onChange={(e) => setReferencecode(e.target.value)}
                   placeholder="Enter reference code"
                 />
               </div>
@@ -910,7 +910,7 @@ export default function NewProductForm() {
                   <p><strong>Language:</strong> {language}</p>
                   <p><strong>Category:</strong> {category}</p>
                   <p><strong>Title:</strong> {title}</p>
-                  <p><strong>Reference Code:</strong> {referenceCode}</p>
+                  <p><strong>Reference Code:</strong> {referencecode}</p>
                 </div>
               </div>
               <div>

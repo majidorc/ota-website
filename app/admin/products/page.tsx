@@ -5,7 +5,7 @@ import Link from "next/link";
 interface Product {
   id: string;
   title: string;
-  referenceCode?: string;
+  referencecode?: string;
   shortDesc?: string;
   photos?: string[];
   status?: string;
@@ -42,7 +42,7 @@ export default function ManageProducts() {
   const filteredProducts = products.filter(product => {
     const matchesSearch =
       product.title?.toLowerCase().includes(search.toLowerCase()) ||
-      product.referenceCode?.toLowerCase().includes(search.toLowerCase());
+      product.referencecode?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter ? product.status === statusFilter : true;
     return matchesSearch && matchesStatus;
   });
@@ -104,37 +104,6 @@ export default function ManageProducts() {
                       <div className="text-xs text-gray-500">{product.shortDesc}</div>
                     </div>
                   </td>
-                  <td className="text-center">{product.referenceCode || "-"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.referencecode}</td>
                   <td>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[product.status || "Not yet submitted"] || "bg-gray-100 text-gray-800"}`}>
-                      {product.status || "Not yet submitted"}
-                    </span>
-                  </td>
-                  <td>
-                    {typeof product.price === 'number' && !isNaN(product.price)
-                      ? `${product.price.toFixed(2)} ${product.currency || ''}`
-                      : "-"}
-                  </td>
-                  <td className="space-x-2">
-                    <Link 
-                      href={`/admin/products/${product.id}`} 
-                      className="inline-block bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-blue-700"
-                    >
-                      See details
-                    </Link>
-                    <Link 
-                      href={`/admin/products/${product.id}/edit`} 
-                      className="inline-block bg-gray-600 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-gray-700"
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
-  );
-} 
+                    <span className={`

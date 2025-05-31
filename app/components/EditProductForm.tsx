@@ -18,7 +18,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
   const [language, setLanguage] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [referenceCode, setReferenceCode] = useState<string>("");
+  const [referencecode, setReferencecode] = useState<string>("");
   const [shortDesc, setShortDesc] = useState<string>("");
   const [fullDesc, setFullDesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
@@ -67,7 +67,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
         setLanguage(data.language || "");
         setCategory(data.category || "");
         setTitle(data.title || "");
-        setReferenceCode(data.referenceCode || "");
+        setReferencecode(data.referencecode || "");
         setShortDesc(data.shortDesc || "");
         setFullDesc(data.fullDesc || "");
         setHighlights(Array.isArray(data.highlights) ? data.highlights : []);
@@ -98,7 +98,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          language, category, title, referenceCode, shortDesc, fullDesc,
+          language, category, title, referencecode, shortDesc, fullDesc,
           highlights, locations, keywords, inclusions: inclusionsText, exclusions: exclusionsText,
           options, price: parseFloat(price), currency, availability, meetingPoint, importantInfo, photos
         }),
@@ -178,8 +178,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
             <input
               type="text"
               className="w-full border rounded px-3 py-2"
-              value={referenceCode}
-              onChange={e => setReferenceCode(e.target.value)}
+              value={referencecode}
+              onChange={e => setReferencecode(e.target.value)}
               maxLength={20}
             />
           </div>
@@ -421,7 +421,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
               <div><strong>Language:</strong> {language}</div>
               <div><strong>Category:</strong> {category}</div>
               <div><strong>Title:</strong> {title}</div>
-              <div><strong>Reference Code:</strong> {referenceCode}</div>
+              <div><strong>Reference Code:</strong> {referencecode}</div>
               <div><strong>Short Desc:</strong> {shortDesc}</div>
               <div><strong>Full Desc:</strong> {fullDesc}</div>
               <div><strong>Highlights:</strong> {highlights.join(', ')}</div>
