@@ -120,28 +120,49 @@ export async function POST(request: Request) {
     }
     const id = `${prefix}${String(idCounter).padStart(2, '0')}`;
     // Insert into database (all lowercase fields)
-    const result = await pool.query(
-      `INSERT INTO product (
-        id, language, category, title, referencecode, shortdesc,
-        fulldesc, highlights, locations, keywords, inclusions,
-        exclusions, options, price, currency, availability,
-        meetingpoint, importantinfo, photos, createdat, updatedat
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
-      RETURNING id`,
-      [
-        id, language, category, title, referencecode, shortdesc,
-        fulldesc,
-        JSON.stringify(highlights),
-        JSON.stringify(locations),
-        JSON.stringify(keywords),
-        inclusions,
-        exclusions,
-        JSON.stringify(options),
-        price, currency, availability,
-        meetingpoint, importantinfo,
-        JSON.stringify(photoUrls)
-      ]
-    );
+    let insertSuccess = false;
+    let result;
+    let maxAttempts = 10;
+    let attempt = 0;
+    while (!insertSuccess && attempt < maxAttempts) {
+      try {
+        result = await pool.query(
+          `INSERT INTO product (
+            id, language, category, title, referencecode, shortdesc,
+            fulldesc, highlights, locations, keywords, inclusions,
+            exclusions, options, price, currency, availability,
+            meetingpoint, importantinfo, photos, createdat, updatedat
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
+          RETURNING id`,
+          [
+            id, language, category, title, referencecode, shortdesc,
+            fulldesc,
+            JSON.stringify(highlights),
+            JSON.stringify(locations),
+            JSON.stringify(keywords),
+            inclusions,
+            exclusions,
+            JSON.stringify(options),
+            price, currency, availability,
+            meetingpoint, importantinfo,
+            JSON.stringify(photoUrls)
+          ]
+        );
+        insertSuccess = true;
+      } catch (error) {
+        // If duplicate key error, increment counter and try again
+        if (error && error.code === '23505' && String(error.detail).includes('Key (id)=')) {
+          idCounter++;
+          id = `${prefix}${String(idCounter).padStart(2, '0')}`;
+          attempt++;
+        } else {
+          throw error;
+        }
+      }
+    }
+    if (!insertSuccess) {
+      throw new Error('Failed to generate unique product ID after multiple attempts');
+    }
     return NextResponse.json({ id: result.rows[0].id });
   } catch (error) {
     console.error('Error creating product:', error);
