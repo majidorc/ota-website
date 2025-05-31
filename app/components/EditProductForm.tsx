@@ -36,6 +36,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [optionName, setOptionName] = useState("");
+  const [optionDesc, setOptionDesc] = useState("");
   const router = useRouter();
 
   const steps = [
@@ -324,25 +326,25 @@ export default function EditProductForm({ productId }: { productId: string }) {
                 type="text"
                 className="flex-1 border rounded px-3 py-2"
                 placeholder="Option name"
-                id="optionName"
-                onChange={e => (window.optionName = e.target.value)}
+                value={optionName}
+                onChange={e => setOptionName(e.target.value)}
               />
               <input
                 type="text"
                 className="flex-1 border rounded px-3 py-2"
                 placeholder="Option description"
-                id="optionDesc"
-                onChange={e => (window.optionDesc = e.target.value)}
+                value={optionDesc}
+                onChange={e => setOptionDesc(e.target.value)}
               />
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded"
                 onClick={() => {
-                  const name = window.optionName?.trim() || '';
-                  const desc = window.optionDesc?.trim() || '';
+                  const name = optionName.trim();
+                  const desc = optionDesc.trim();
                   if (name && desc) {
                     setOptions([...options, { name, description: desc }]);
-                    document.getElementById('optionName').value = '';
-                    document.getElementById('optionDesc').value = '';
+                    setOptionName("");
+                    setOptionDesc("");
                   }
                 }}
               >Add</button>
