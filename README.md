@@ -92,3 +92,35 @@ MIT
   You should see `product` in the results.
 - If you get errors like `relation "product" does not exist`, double-check your connection string and that the table exists in the correct branch/database.
 - For more help, see the project changelog or contact the maintainer. 
+
+## Product ID Format
+- Product IDs are now strings in the format YYMMDD01 (e.g., 24060101 for the first product created on June 1, 2024).
+- The ID is unique, not editable, and used as the primary key for new products.
+- Reference code is optional, editable, and not unique.
+
+## Database Migration
+- Run `migrations/003_change_product_id_to_string.sql` manually on your database to apply the new ID format.
+
+## Recent Changes
+- Switched product ID to date-based string format as the primary key.
+- Reference code is now optional and editable.
+- Product creation API updated to generate IDs automatically.
+- **Product edit page now uses a multi-step sidebar stepper, allowing editing of all fields.**
+- **Product detail pages use SEO-friendly URLs: `/tours/[title-of-product]-[id]`.**
+- **PATCH handler added to `/api/products/[id]` for editing products.**
+- **Reference code column type fixed to VARCHAR to support LIKE queries.**
+
+### Troubleshooting
+- **405 Method Not Allowed on PATCH:** Ensure your `/api/products/[id]` route exports a PATCH handler.
+- **SQL error: operator does not exist: integer ~~ unknown:** Make sure your `referenceCode` column is VARCHAR, not INTEGER. Run:
+  ```sql
+  ALTER TABLE "Product" ALTER COLUMN "referenceCode" TYPE VARCHAR(50) USING "referenceCode"::VARCHAR;
+  ```
+
+## Product ID Format
+- Product IDs are now strings in the format YYMMDD01 (e.g., 24060101 for the first product created on June 1, 2024).
+- The ID is unique, not editable, and used as the primary key for new products.
+- Reference code is optional, editable, and not unique.
+
+## Database Migration
+- Run `migrations/003_change_product_id_to_string.sql` manually on your database to apply the new ID format. 
