@@ -30,7 +30,7 @@ interface Product {
 // GET /api/products - List all products
 export async function GET() {
   try {
-    const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+    const result = await pool.query('SELECT * FROM "Product" ORDER BY "createdAt" DESC');
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -85,12 +85,12 @@ export async function POST(request: Request) {
 
     // Insert into database
     const result = await pool.query(
-      `INSERT INTO products (
-        language, category, title, reference_code, short_description,
-        full_description, highlights, locations, keywords, inclusions,
+      `INSERT INTO "Product" (
+        language, category, title, referenceCode, shortDesc,
+        fullDesc, highlights, locations, keywords, inclusions,
         exclusions, options, price, currency, availability,
-        meeting_point, important_info, photos
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        meetingPoint, importantInfo, photos, createdAt, updatedAt
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW(), NOW())
       RETURNING id`,
       [
         language, category, title, referenceCode, shortDesc,
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json(
-      { error: 'Failed to create product' },
+      { error: error instanceof Error ? error.message : 'Failed to create product' },
       { status: 500 }
     );
   }
