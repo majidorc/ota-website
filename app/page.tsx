@@ -4,9 +4,21 @@ import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import SearchBar from './components/SearchBar'
 
+interface Product {
+  id: string;
+  title: string;
+  referenceCode?: string;
+  shortDesc?: string;
+  photos?: string[];
+  status?: string;
+  price?: number;
+  currency?: string;
+  category?: string;
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState('For you')
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const tabs = ['For you', 'Culture', 'Food', 'Nature']
 
