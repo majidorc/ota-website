@@ -219,11 +219,20 @@ export default function AdminDashboard() {
 
           {/* Main Content */}
           <div className="mt-8">
-            {showNewProductForm ? (
-              <div className="mb-8">
-                <NewProductForm onClose={() => setShowNewProductForm(false)} />
+            {showNewProductForm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="relative w-full max-w-5xl mx-auto">
+                  <NewProductForm onClose={() => setShowNewProductForm(false)} />
+                </div>
+                <button
+                  className="fixed inset-0 w-full h-full cursor-default"
+                  style={{ background: 'transparent', border: 'none', zIndex: 40 }}
+                  aria-label="Close modal"
+                  onClick={() => setShowNewProductForm(false)}
+                  tabIndex={-1}
+                />
               </div>
-            ) : null}
+            )}
             <h1 className="text-2xl font-bold mb-6">Products</h1>
             <div className="overflow-x-auto bg-white rounded shadow">
               <table className="min-w-full divide-y divide-gray-200">
