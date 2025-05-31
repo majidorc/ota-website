@@ -55,7 +55,27 @@ export async function POST(request: Request) {
     const language = formData.get('language') as string;
     const category = formData.get('category') as string;
     const title = formData.get('title') as string;
-    const referenceCode = formData.get('referenceCode') as string;
+    let referenceCode = formData.get('referenceCode') as string;
+    if (!referenceCode) {
+      // Generate reference code: YYMMDD01, YYMMDD02, etc.
+      const now = new Date();
+      const yy = String(now.getFullYear()).slice(-2);
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const prefix = `${yy}${mm}${dd}`;
+      // Find the max counter for today
+      const { rows } = await pool.query(
+        `SELECT "referenceCode" FROM product WHERE "referenceCode" LIKE $1 ORDER BY "referenceCode" DESC LIMIT 1`,
+        [`${prefix}%`]
+      );
+      let counter = 1;
+      if (rows.length > 0) {
+        const lastCode = rows[0].referenceCode;
+        const lastCounter = parseInt(lastCode.slice(-2), 10);
+        counter = isNaN(lastCounter) ? 1 : lastCounter + 1;
+      }
+      referenceCode = `${prefix}${String(counter).padStart(2, '0')}`;
+    }
     const shortDesc = formData.get('shortDesc') as string;
     const fullDesc = formData.get('fullDesc') as string;
     const highlights = formData.get('highlights') as string;
