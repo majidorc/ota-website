@@ -108,17 +108,36 @@ export async function POST(request: Request) {
       }
     }
 
+    // Generate product id: YYMMDD01, YYMMDD02, etc.
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const prefix = `${yy}${mm}${dd}`;
+    // Find the max counter for today
+    const { rows: idRows } = await pool.query(
+      `SELECT id FROM product WHERE id LIKE $1 ORDER BY id DESC LIMIT 1`,
+      [`${prefix}%`]
+    );
+    let idCounter = 1;
+    if (idRows.length > 0) {
+      const lastId = idRows[0].id;
+      const lastCounter = parseInt(lastId.slice(-2), 10);
+      idCounter = isNaN(lastCounter) ? 1 : lastCounter + 1;
+    }
+    const id = `${prefix}${String(idCounter).padStart(2, '0')}`;
+
     // Insert into database
     const result = await pool.query(
       `INSERT INTO product (
-        language, category, title, referenceCode, shortDesc,
+        id, language, category, title, referenceCode, shortDesc,
         fullDesc, highlights, locations, keywords, inclusions,
         exclusions, options, price, currency, availability,
         meetingPoint, importantInfo, photos, createdAt, updatedAt
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW(), NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
       RETURNING id`,
       [
-        language, category, title, referenceCode, shortDesc,
+        id, language, category, title, referenceCode, shortDesc,
         fullDesc,
         highlights ? highlights : '[]',
         locations ? locations : '[]',
