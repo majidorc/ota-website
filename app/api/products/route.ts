@@ -31,7 +31,12 @@ interface Product {
 export async function GET() {
   try {
     const result = await pool.query('SELECT * FROM product ORDER BY createdAt DESC');
-    return NextResponse.json(result.rows);
+    // Ensure price is always a number
+    const products = result.rows.map(row => ({
+      ...row,
+      price: row.price !== null ? Number(row.price) : null,
+    }));
+    return NextResponse.json(products);
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json(
