@@ -115,8 +115,19 @@ export default function ManageProducts() {
                       ? `${product.price.toFixed(2)} ${product.currency || ''}`
                       : "-"}
                   </td>
-                  <td>
-                    <Link href={`/admin/products/${product.id}`} className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">See details</Link>
+                  <td className="space-x-2">
+                    <Link 
+                      href={`/admin/products/${product.id}`} 
+                      className="inline-block bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-blue-700"
+                    >
+                      See details
+                    </Link>
+                    <Link 
+                      href={`/admin/products/${product.id}/edit`} 
+                      className="inline-block bg-gray-600 text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-gray-700"
+                    >
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))}
