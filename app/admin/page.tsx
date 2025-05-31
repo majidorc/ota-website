@@ -1,6 +1,15 @@
 "use client";
-import React, { useEffect, useRef, useState, ChangeEvent, KeyboardEvent, MouseEvent } from "react";
+import React, { useEffect, useRef, useState, ChangeEvent, KeyboardEvent, MouseEvent, JSX } from "react";
 import { useRouter } from "next/navigation";
+
+// Add type declarations for JSX elements
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}
 
 interface Product {
   id: number;
