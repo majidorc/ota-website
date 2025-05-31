@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, ChangeEvent, KeyboardEvent, MouseEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 
 const languages = ["English", "French", "German", "Spanish", "Italian", "Thai"];
@@ -42,6 +42,8 @@ export default function NewProductForm() {
   const [importantInfo, setImportantInfo] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingChatGPT, setLoadingChatGPT] = useState(false);
+  const [chatGPTError, setChatGPTError] = useState<string | null>(null);
   const router = useRouter();
 
   const steps = [
@@ -78,7 +80,6 @@ export default function NewProductForm() {
 
   // Submit handler for step 15
   const handleSubmit = async () => {
-    console.log('Submit clicked');
     setLoading(true);
     setError(null);
     try {
@@ -101,7 +102,6 @@ export default function NewProductForm() {
         meetingPoint,
         importantInfo,
       };
-      console.log('Submitting product:', payload);
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -134,8 +134,6 @@ export default function NewProductForm() {
       <span className="bg-gray-100 px-2 py-1 rounded ml-2">Enter</span> Continue
     </div>
   );
-
-  console.log('Component mounted');
 
   return (
     <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
@@ -246,133 +244,125 @@ export default function NewProductForm() {
             </div>
           </div>
         )}
-        {/* Step 3: Product Details and Submit */}
+        {/* Step 3: Automated content creator */}
         {step === 3 && (
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">3</span>
-              <span className="font-semibold">Product Details</span>
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Product Name</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Reference Code</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={referenceCode}
-                onChange={e => setReferenceCode(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Short Description</label>
-              <textarea
-                className="w-full border rounded px-3 py-2"
-                value={shortDesc}
-                onChange={e => setShortDesc(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Full Description</label>
-              <textarea
-                className="w-full border rounded px-3 py-2"
-                value={fullDesc}
-                onChange={e => setFullDesc(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Price (USD)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full border rounded px-3 py-2"
-                value={price}
-                onChange={e => setPrice(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Currency</label>
-              <select
-                className="w-full border rounded px-3 py-2"
-                value={currency}
-                onChange={e => setCurrency(e.target.value)}
-              >
-                <option value="THB">THB</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="JPY">JPY</option>
-              </select>
-            </div>
-            {error && <div className="text-red-600 mb-4">{error}</div>}
-            <div className="flex justify-between">
-              <button
-                type="button"
-                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-                onClick={() => setStep(2)}
-                disabled={loading}
-              >Back</button>
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled={loading || !title || !referenceCode || !shortDesc || !fullDesc || !price}
-              >{loading ? "Submitting..." : "Add Product"}</button>
-            </div>
-          </form>
-        )}
-        {/* Step 15: Review & Submit */}
-        {step === 15 && (
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-blue-600 font-bold">15</span>
-              <span className="font-semibold">Review & Submit</span>
+              <span className="text-blue-600 font-bold">3</span>
+              <span className="font-semibold">Automated content creator</span>
             </div>
             <div className="mb-4">
-              <h2 className="font-bold mb-2">Review your product details</h2>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li><b>Language:</b> {language}</li>
-                <li><b>Category:</b> {category}</li>
-                <li><b>Title:</b> {title}</li>
-                <li><b>Reference Code:</b> {referenceCode}</li>
-                <li><b>Short Description:</b> {shortDesc}</li>
-                <li><b>Full Description:</b> {fullDesc}</li>
-                <li><b>Highlights:</b> {highlights.join(", ")}</li>
-                <li><b>Locations:</b> {locations.join(", ")}</li>
-                <li><b>Keywords:</b> {keywords.join(", ")}</li>
-                <li><b>Inclusions:</b> {inclusionsText}</li>
-                <li><b>Exclusions:</b> {exclusionsText}</li>
-                <li><b>Options:</b> {options.map(o => o.name).join(", ")}</li>
-                <li><b>Price:</b> {price} {currency}</li>
-                <li><b>Availability:</b> {availability}</li>
-                <li><b>Meeting Point:</b> {meetingPoint}</li>
-                <li><b>Important Info:</b> {importantInfo}</li>
-                <li><b>Photos:</b> {photos.length} uploaded</li>
-              </ul>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                <b>How it works</b>
+                <ol className="list-decimal ml-6 mt-2 text-gray-700">
+                  <li>Provide your content, then we'll fill out most of the sections for you</li>
+                  <li>Check for accuracy and make changes if necessary</li>
+                  <li>You'll still need to upload photos and create the booking options yourself</li>
+                </ol>
+              </div>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                Products using the automated creator are likely to get more bookings, plus it saves you time.
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Get started</label>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contentMode"
+                      value="copy"
+                      checked={contentMode === "copy"}
+                      onChange={() => setContentMode("copy")}
+                      className="mr-2"
+                    />
+                    Copy and paste your content <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded">Recommended</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contentMode"
+                      value="manual"
+                      checked={contentMode === "manual"}
+                      onChange={() => setContentMode("manual")}
+                      className="mr-2"
+                    />
+                    Skip and create product manually
+                  </label>
+                </div>
+                {contentMode === "copy" && (
+                  <div className="mb-4">
+                    <label className="block mb-2 font-semibold">Get started by copy-pasting a detailed description about your activity here.</label>
+                    <textarea
+                      className="w-full border rounded px-3 py-2 min-h-[120px]"
+                      value={content}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                      placeholder="Write at least 700 characters."
+                      maxLength={5000}
+                    />
+                    <div className="text-right text-xs text-gray-500">{content.length} / 5000</div>
+                  </div>
+                )}
+              </div>
             </div>
-            {error && <div className="text-red-600 mb-4">{error}</div>}
             <div className="flex justify-between">
-              <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={() => setStep(14)}>Back</button>
-              <button className="bg-green-600 text-white px-6 py-2 rounded font-semibold" onClick={handleSubmit} disabled={loading}>
-                {loading ? "Submitting..." : "Submit"}
-              </button>
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(2)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={async () => {
+                  setChatGPTError(null);
+                  if (contentMode === "copy" && content.trim()) {
+                    setLoadingChatGPT(true);
+                    try {
+                      const res = await fetch("/api/chatgpt-content-extract", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ content }),
+                      });
+
+                      const data = await res.json();
+                      if (data.error) {
+                        setChatGPTError("ChatGPT API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
+                      } else {
+                        setTitle(data.title || "");
+                        setShortDesc(data.shortDescription || "");
+                        setFullDesc(data.fullDescription || "");
+                        setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
+                        setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
+                        setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
+                        setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
+                        setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map((k: string) => k.trim()) : []));
+                        setLoadingChatGPT(false);
+                        setStep(4);
+                      }
+                    } catch (err: any) {
+                      setChatGPTError("Failed to connect to ChatGPT API: " + (err?.message || err));
+                    } finally {
+                      setLoadingChatGPT(false);
+                    }
+                  } else {
+                    setStep(4);
+                  }
+                }}
+                disabled={loadingChatGPT || (contentMode === "copy" && !content.trim())}
+              >Continue</button>
             </div>
+            {chatGPTError && (
+              <div className="bg-red-100 border-l-4 border-red-400 p-4 text-red-700 text-sm mb-4">{chatGPTError}</div>
+            )}
+            {loadingChatGPT && (
+              <div className="bg-blue-100 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
+                Generating suggestions from ChatGPT...
+              </div>
+            )}
           </div>
         )}
-        {/* Always-on test submit button for debugging */}
-        <button style={{position: 'fixed', bottom: 20, right: 20, zIndex: 1000, background: 'red', color: 'white', padding: '12px 24px', borderRadius: 8}} onClick={handleSubmit}>
-          TEST SUBMIT
-        </button>
+        {/* Step 4: Main Information */}
+        {/* ... (rest of steps unchanged) ... */}
       </div>
     </div>
   );
