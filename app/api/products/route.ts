@@ -9,6 +9,20 @@ interface Product {
   image: string | null;
   createdAt: Date;
   updatedAt: Date;
+  title?: string;
+  referenceCode?: string;
+  shortDesc?: string;
+  fullDesc?: string;
+  highlights?: string[];
+  locations?: string[];
+  keywords?: string[];
+  inclusions?: string;
+  exclusions?: string;
+  options?: any[];
+  currency?: string;
+  availability?: string;
+  meetingPoint?: string;
+  importantInfo?: string;
 }
 
 // GET /api/products - List all products
@@ -27,8 +41,31 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const res = await pool.query<Product>(
-      `INSERT INTO "Product" (name, description, price, image, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *`,
-      [data.name, data.description, data.price, data.image]
+      `INSERT INTO "Product" (
+        name, description, price, image, title, "referenceCode", "shortDesc", "fullDesc", highlights, locations, keywords, inclusions, exclusions, options, currency, availability, "meetingPoint", "importantInfo", "createdAt", "updatedAt"
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW(), NOW()
+      ) RETURNING *`,
+      [
+        data.title || data.name,
+        data.shortDesc || data.description,
+        data.price,
+        data.image || null,
+        data.title,
+        data.referenceCode,
+        data.shortDesc,
+        data.fullDesc,
+        data.highlights ? JSON.stringify(data.highlights) : null,
+        data.locations ? JSON.stringify(data.locations) : null,
+        data.keywords ? JSON.stringify(data.keywords) : null,
+        data.inclusions,
+        data.exclusions,
+        data.options ? JSON.stringify(data.options) : null,
+        data.currency,
+        data.availability,
+        data.meetingPoint,
+        data.importantInfo
+      ]
     );
     return NextResponse.json(res.rows[0]);
   } catch (error) {
