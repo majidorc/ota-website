@@ -27,11 +27,11 @@ const statusColors: Record<string, string> = {
 };
 
 const menuTabs = [
-  { name: "Create", dropdown: [{ label: "New Product", href: "/admin/products/new" }] },
-  { name: "Manage", dropdown: [{ label: "Products", href: "/admin/products" }] },
-  { name: "Bookings", dropdown: [{ label: "Bookings", href: "/admin/bookings" }] },
-  { name: "Performance", href: "/admin/performance" },
-  { name: "Finance", href: "/admin/finance" },
+  { name: "Create", dropdown: [{ label: "New Product", href: "/admin/products/new", internal: true }] },
+  { name: "Manage", dropdown: [{ label: "Products", href: "/admin/products", internal: true }] },
+  { name: "Bookings", dropdown: [{ label: "Bookings", href: "/admin/bookings", internal: true }] },
+  { name: "Performance", href: "/admin/performance", internal: true },
+  { name: "Finance", href: "/admin/finance", internal: true },
 ];
 
 const languages = ["English", "French", "German", "Spanish", "Italian", "Thai"];
@@ -155,7 +155,12 @@ export default function AdminDashboard() {
                             key={item.label}
                             href={item.href || '#'}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setOpenDropdown(null)}
+                            onClick={() => {
+                              setOpenDropdown(null);
+                              if (!item.internal) {
+                                window.open(item.href, '_blank');
+                              }
+                            }}
                           >
                             {item.label}
                           </Link>

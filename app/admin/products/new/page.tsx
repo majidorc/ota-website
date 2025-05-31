@@ -249,7 +249,7 @@ export default function NewProductForm() {
           <div>
             <div className="mb-4 flex items-center gap-2">
               <span className="text-blue-600 font-bold">3</span>
-              <span className="font-semibold">Automated content creator</span>
+              <span className="font-semibold">Automated Content Creator</span>
             </div>
             <div className="mb-4">
               <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-blue-700 text-sm mb-4">
@@ -362,7 +362,125 @@ export default function NewProductForm() {
           </div>
         )}
         {/* Step 4: Main Information */}
-        {/* ... (rest of steps unchanged) ... */}
+        {step === 4 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">4</span>
+              <span className="font-semibold">Main Information</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Title</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter product title"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">Reference Code</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={referenceCode}
+                  onChange={(e) => setReferenceCode(e.target.value)}
+                  placeholder="Enter reference code"
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(3)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(5)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 5: Descriptions & Highlights */}
+        {step === 5 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">5</span>
+              <span className="font-semibold">Descriptions & Highlights</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Short Description</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={shortDesc}
+                  onChange={(e) => setShortDesc(e.target.value)}
+                  placeholder="Enter short description"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">Full Description</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={fullDesc}
+                  onChange={(e) => setFullDesc(e.target.value)}
+                  placeholder="Enter full description"
+                  rows={6}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">Highlights</label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={highlightInput}
+                    onChange={(e) => setHighlightInput(e.target.value)}
+                    placeholder="Enter highlight"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && highlightInput.trim()) {
+                        setHighlights([...highlights, highlightInput.trim()]);
+                        setHighlightInput('');
+                      }
+                    }}
+                  />
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      if (highlightInput.trim()) {
+                        setHighlights([...highlights, highlightInput.trim()]);
+                        setHighlightInput('');
+                      }
+                    }}
+                  >Add</button>
+                </div>
+                <div className="space-y-2">
+                  {highlights.map((highlight, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="flex-1">{highlight}</span>
+                      <button
+                        className="text-red-600"
+                        onClick={() => setHighlights(highlights.filter((_, i) => i !== index))}
+                      >Remove</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(4)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(6)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
