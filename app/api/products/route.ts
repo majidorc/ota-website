@@ -118,7 +118,7 @@ export async function POST(request: Request) {
       const lastCounter = parseInt(lastId.slice(-2), 10);
       idCounter = isNaN(lastCounter) ? 1 : lastCounter + 1;
     }
-    const id = `${prefix}${String(idCounter).padStart(2, '0')}`;
+    let id = `${prefix}${String(idCounter).padStart(2, '0')}`;
     // Insert into database (all lowercase fields)
     let insertSuccess = false;
     let result;
