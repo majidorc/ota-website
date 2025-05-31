@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Category, Difficulty } from "@prisma/client";
+
+const Category = ["ADVENTURE", "CULTURAL", "NATURE", "URBAN", "RELAXATION"];
+const Difficulty = ["EASY", "MODERATE", "CHALLENGING"];
 
 export default function NewActivity() {
   const router = useRouter();
@@ -28,8 +30,8 @@ export default function NewActivity() {
       duration: parseInt(formData.get("duration") as string),
       maxGroupSize: parseInt(formData.get("maxGroupSize") as string),
       minAge: parseInt(formData.get("minAge") as string) || null,
-      difficulty: formData.get("difficulty") as Difficulty,
-      category: formData.get("category") as Category,
+      difficulty: formData.get("difficulty"),
+      category: formData.get("category"),
     };
 
     try {
@@ -106,7 +108,7 @@ export default function NewActivity() {
               className="w-full p-2 border rounded-lg"
             >
               <option value="">Select category</option>
-              {Object.values(Category).map((category) => (
+              {Category.map((category) => (
                 <option key={category} value={category}>
                   {category}
                 </option>
@@ -122,7 +124,7 @@ export default function NewActivity() {
               className="w-full p-2 border rounded-lg"
             >
               <option value="">Select difficulty</option>
-              {Object.values(Difficulty).map((difficulty) => (
+              {Difficulty.map((difficulty) => (
                 <option key={difficulty} value={difficulty}>
                   {difficulty}
                 </option>
