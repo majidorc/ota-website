@@ -14,7 +14,8 @@
 - Product edit page now uses a multi-step sidebar stepper, allowing editing of all fields.
 - Product detail pages use SEO-friendly URLs: `/tours/[title-of-product]-[id]`.
 - PATCH handler added to `/api/products/[id]` for editing products.
-- Fixed: referenceCode column type is now VARCHAR to support LIKE queries.
+- Fixed: referencecode column type is now VARCHAR to support LIKE queries.
+- Standardized: All references to reference code now use lowercase `referencecode` for consistency across components and API endpoints.
 
 ## [Earlier]
 - Initial project setup with Next.js, Neon Postgres, and admin dashboard.
