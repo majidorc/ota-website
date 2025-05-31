@@ -79,3 +79,16 @@ MIT
 - The form is fully embedded in the main content area (not a modal, not a new route, not an iframe).
 - When you close or submit the form, the product list reappears in the same place.
 - This provides a seamless single-page app experience for product management. 
+
+## Troubleshooting
+
+### Database connection and table existence
+- Ensure your `DATABASE_URL` in your `.env` file matches your Neon project, branch, and database name.
+- The app requires a table named `product` (all lowercase) in your database.
+- To verify, connect to your Neon database and run:
+  ```sql
+  SELECT tablename FROM pg_tables WHERE schemaname = 'public';
+  ```
+  You should see `product` in the results.
+- If you get errors like `relation "product" does not exist`, double-check your connection string and that the table exists in the correct branch/database.
+- For more help, see the project changelog or contact the maintainer. 

@@ -8,6 +8,7 @@
 - Chore: Updated migrations for full product schema.
 - Chore: Updated README for new setup and workflow.
 - Added: New Product form now appears in the main content area of `/admin`, replacing the product list until closed or submitted, without changing the route.
+- Docs: Added troubleshooting section to README for Neon/Postgres connection and table existence.
 
 ## [Earlier]
 - Initial project setup with Next.js, Neon Postgres, and admin dashboard. 
