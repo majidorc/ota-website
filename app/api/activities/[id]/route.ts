@@ -1,6 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+// Define types for database rows
+interface Activity {
+  id: string;
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  locations: string[];
+  keywords: string[];
+  price: number;
+  duration: number;
+  maxGroupSize: number;
+  minAge: number | null;
+  difficulty: string;
+  category: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  images?: Image[];
+  schedules?: Schedule[];
+  reviews?: Review[];
+}
+
+interface Image {
+  id: string;
+  url: string;
+  alt: string | null;
+  activityId: string;
+  createdAt: Date;
+}
+
+interface Schedule {
+  id: string;
+  activityId: string;
+  startTime: Date;
+  endTime: Date;
+  maxCapacity: number;
+  currentBookings: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface Review {
+  id: string;
+  userId: string;
+  activityId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  username?: string;
+  userName?: string;
+}
+
 // GET /api/activities/[id] - Get single activity
 export async function GET(
   req: NextRequest,
@@ -8,7 +64,7 @@ export async function GET(
 ) {
   try {
     // Fetch activity
-    const activityRes = await pool.query(
+    const activityRes = await pool.query<Activity>(
       `SELECT * FROM "Activity" WHERE id = $1`,
       [params.id]
     );
@@ -21,13 +77,13 @@ export async function GET(
     }
     // Fetch images, schedules, reviews (with user name)
     const [imagesRes, schedulesRes, reviewsRes] = await Promise.all([
-      pool.query(`SELECT * FROM "Image" WHERE "activityId" = $1`, [params.id]),
-      pool.query(`SELECT * FROM "Schedule" WHERE "activityId" = $1 AND "startTime" >= $2`, [params.id, new Date()]),
-      pool.query(`SELECT r.*, u.name as userName FROM "Review" r JOIN "User" u ON r."userId" = u.id WHERE r."activityId" = $1`, [params.id])
+      pool.query<Image>(`SELECT * FROM "Image" WHERE "activityId" = $1`, [params.id]),
+      pool.query<Schedule>(`SELECT * FROM "Schedule" WHERE "activityId" = $1 AND "startTime" >= $2`, [params.id, new Date()]),
+      pool.query<Review>(`SELECT r.*, u.name as userName FROM "Review" r JOIN "User" u ON r."userId" = u.id WHERE r."activityId" = $1`, [params.id])
     ]);
     activity.images = imagesRes.rows;
     activity.schedules = schedulesRes.rows;
-    activity.reviews = reviewsRes.rows.map(r => ({
+    activity.reviews = reviewsRes.rows.map((r: Review) => ({
       ...r,
       user: { name: r.username || r.userName }
     }));
@@ -57,7 +113,7 @@ export async function PATCH(
       values.push(data[key]);
     }
     values.push(params.id);
-    const updateRes = await pool.query(
+    const updateRes = await pool.query<Activity>(
       `UPDATE "Activity" SET ${setClauses.join(', ')}, "updatedAt" = NOW() WHERE id = $${idx} RETURNING *`,
       values
     );
