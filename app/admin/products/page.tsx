@@ -106,4 +106,27 @@ export default function ManageProducts() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.referencecode}</td>
                   <td>
-                    <span className={`
+                    <span className={`${statusColors[product.status || "Bookable"]} px-2 py-1 rounded text-xs font-medium`}>
+                      {product.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {product.price ? `${product.price} ${product.currency || ""}` : "-"}
+                  </td>
+                  <td>
+                    <Link
+                      href={`/admin/products/${product.id}/edit`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
