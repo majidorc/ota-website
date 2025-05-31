@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import pool from '@/lib/db';
 
 // GET /api/activities/[id] - Get single activity
 export async function GET(
@@ -7,36 +7,30 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const activity = await prisma.activity.findUnique({
-      where: { id: params.id },
-      include: {
-        images: true,
-        schedules: {
-          where: {
-            startTime: {
-              gte: new Date(),
-            },
-          },
-        },
-        reviews: {
-          include: {
-            user: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
+    // Fetch activity
+    const activityRes = await pool.query(
+      `SELECT * FROM "Activity" WHERE id = $1`,
+      [params.id]
+    );
+    const activity = activityRes.rows[0];
     if (!activity) {
       return NextResponse.json(
         { error: 'Activity not found' },
         { status: 404 }
       );
     }
-
+    // Fetch images, schedules, reviews (with user name)
+    const [imagesRes, schedulesRes, reviewsRes] = await Promise.all([
+      pool.query(`SELECT * FROM "Image" WHERE "activityId" = $1`, [params.id]),
+      pool.query(`SELECT * FROM "Schedule" WHERE "activityId" = $1 AND "startTime" >= $2`, [params.id, new Date()]),
+      pool.query(`SELECT r.*, u.name as userName FROM "Review" r JOIN "User" u ON r."userId" = u.id WHERE r."activityId" = $1`, [params.id])
+    ]);
+    activity.images = imagesRes.rows;
+    activity.schedules = schedulesRes.rows;
+    activity.reviews = reviewsRes.rows.map(r => ({
+      ...r,
+      user: { name: r.username || r.userName }
+    }));
     return NextResponse.json(activity);
   } catch (error) {
     console.error('Error fetching activity:', error);
@@ -54,10 +48,20 @@ export async function PATCH(
 ) {
   try {
     const data = await req.json();
-    const activity = await prisma.activity.update({
-      where: { id: params.id },
-      data,
-    });
+    // Build dynamic SET clause
+    const setClauses = [];
+    const values = [];
+    let idx = 1;
+    for (const key in data) {
+      setClauses.push(`"${key}" = $${idx++}`);
+      values.push(data[key]);
+    }
+    values.push(params.id);
+    const updateRes = await pool.query(
+      `UPDATE "Activity" SET ${setClauses.join(', ')}, "updatedAt" = NOW() WHERE id = $${idx} RETURNING *`,
+      values
+    );
+    const activity = updateRes.rows[0];
     return NextResponse.json(activity);
   } catch (error) {
     console.error('Error updating activity:', error);
@@ -74,9 +78,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.activity.delete({
-      where: { id: params.id },
-    });
+    await pool.query(`DELETE FROM "Activity" WHERE id = $1`, [params.id]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting activity:', error);
