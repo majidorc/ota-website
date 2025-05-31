@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const languages = ["English", "French", "German", "Spanish", "Italian", "Thai"];
 const categories = [
@@ -16,6 +17,43 @@ export default function NewProduct() {
   const [step, setStep] = useState(1);
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          description,
+          price: parseFloat(price),
+          image,
+          language,
+          category,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Failed to create product");
+        setLoading(false);
+        return;
+      }
+      router.push("/admin/products");
+    } catch (err) {
+      setError("Failed to create product");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
@@ -101,27 +139,66 @@ export default function NewProduct() {
             </div>
           </div>
         )}
-        {/* Step 3: Placeholder */}
+        {/* Step 3: Product Details and Submit */}
         {step === 3 && (
-          <div>
+          <form onSubmit={handleSubmit}>
             <div className="mb-4 flex items-center gap-2">
               <span className="text-blue-600 font-bold">3</span>
-              <span className="font-semibold">Automated content creator (Coming soon)</span>
+              <span className="font-semibold">Product Details</span>
             </div>
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700 text-sm mb-4">
-              This is a placeholder for the next step. The full step will be implemented next.
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Product Name</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+              />
             </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Description</label>
+              <textarea
+                className="w-full border rounded px-3 py-2"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Price (USD)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full border rounded px-3 py-2"
+                value={price}
+                onChange={e => setPrice(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Image URL</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={image}
+                onChange={e => setImage(e.target.value)}
+              />
+            </div>
+            {error && <div className="text-red-600 mb-4">{error}</div>}
             <div className="flex justify-between">
               <button
+                type="button"
                 className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
                 onClick={() => setStep(2)}
+                disabled={loading}
               >Back</button>
               <button
+                type="submit"
                 className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-                disabled
-              >Continue</button>
+                disabled={loading || !name || !description || !price}
+              >{loading ? "Submitting..." : "Add Product"}</button>
             </div>
-          </div>
+          </form>
         )}
       </div>
     </div>
