@@ -27,6 +27,15 @@ interface Product {
   updatedAt: string;
 }
 
+type HistoryItem = {
+  date: string;
+  status: string;
+  section: string;
+  before: string;
+  after: string;
+  editor: string;
+};
+
 const statusColors: Record<string, string> = {
   Bookable: "bg-green-100 text-green-800",
   Deactivated: "bg-gray-100 text-gray-800",
@@ -56,7 +65,7 @@ const mockOptions = [
   },
 ];
 
-const mockHistory = [
+const mockHistory: HistoryItem[] = [
   // Example: { date: '2024-05-01', status: 'Active', section: 'Title', before: 'Old', after: 'New', editor: 'Admin' }
 ];
 
