@@ -163,7 +163,6 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
-              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold text-center md:text-left">Unlocked – Spring 2025 <span className="ml-1 bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px] align-middle">NEW</span></span>
               <div className="flex items-center gap-2 justify-center md:justify-start">
                 <span className="font-semibold text-gray-700">Majid</span>
                 <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">M</div>
