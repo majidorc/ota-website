@@ -1,6 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+// Define types for database rows
+interface Booking {
+  id: string;
+  userId: string;
+  activityId: string;
+  scheduleId: string;
+  participants: number;
+  totalPrice: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  activity?: Activity;
+  schedule?: Schedule;
+}
+
+interface Activity {
+  id: string;
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  locations: string[];
+  keywords: string[];
+  price: number;
+  duration: number;
+  maxGroupSize: number;
+  minAge: number | null;
+  difficulty: string;
+  category: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  images?: Image[];
+}
+
+interface Image {
+  id: string;
+  url: string;
+  alt: string | null;
+  activityId: string;
+  createdAt: Date;
+}
+
+interface Schedule {
+  id: string;
+  activityId: string;
+  startTime: Date;
+  endTime: Date;
+  maxCapacity: number;
+  currentBookings: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // GET /api/bookings - Get user's bookings
 export async function GET(req: NextRequest) {
   try {
@@ -14,7 +70,7 @@ export async function GET(req: NextRequest) {
       );
     }
     // Fetch bookings with activity (with images) and schedule
-    const bookingsRes = await pool.query(
+    const bookingsRes = await pool.query<Booking & Activity & Schedule>(
       `SELECT b.*, a.*, s.*, b.id as bookingId FROM "Booking" b
         JOIN "Activity" a ON b."activityId" = a.id
         JOIN "Schedule" s ON b."scheduleId" = s.id
@@ -24,17 +80,17 @@ export async function GET(req: NextRequest) {
     );
     const bookings = bookingsRes.rows;
     // Fetch images for all activities
-    const activityIds = bookings.map((b: any) => b.activityId);
-    let images: any[] = [];
+    const activityIds = bookings.map((b: Booking) => b.activityId);
+    let images: Image[] = [];
     if (activityIds.length) {
-      const imagesRes = await pool.query(
+      const imagesRes = await pool.query<Image>(
         `SELECT * FROM "Image" WHERE "activityId" = ANY($1)`,
         [activityIds]
       );
       images = imagesRes.rows;
     }
     // Attach images to each booking's activity
-    const bookingsWithDetails = bookings.map((booking: any) => ({
+    const bookingsWithDetails = bookings.map((booking: Booking & Activity & Schedule) => ({
       ...booking,
       activity: {
         ...booking,
@@ -66,7 +122,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { userId, activityId, scheduleId, participants } = data;
     // Check if schedule is available
-    const scheduleRes = await pool.query(
+    const scheduleRes = await pool.query<Schedule>(
       `SELECT * FROM "Schedule" WHERE id = $1`,
       [scheduleId]
     );
@@ -84,7 +140,7 @@ export async function POST(req: NextRequest) {
       );
     }
     // Get activity price
-    const activityRes = await pool.query(
+    const activityRes = await pool.query<Activity>(
       `SELECT price FROM "Activity" WHERE id = $1`,
       [activityId]
     );
@@ -101,7 +157,7 @@ export async function POST(req: NextRequest) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const bookingRes = await client.query(
+      const bookingRes = await client.query<Booking>(
         `INSERT INTO "Booking" ("userId", "activityId", "scheduleId", participants, "totalPrice", status, "createdAt", "updatedAt")
          VALUES ($1, $2, $3, $4, $5, 'PENDING', NOW(), NOW()) RETURNING *`,
         [userId, activityId, scheduleId, participants, totalPrice]
