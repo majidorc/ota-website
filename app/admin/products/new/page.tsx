@@ -326,20 +326,24 @@ export default function NewProductForm() {
                         },
                         body: JSON.stringify({ content }),
                       });
-
                       const data = await res.json();
                       if (data.error) {
                         setChatGPTError("ChatGPT API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
                       } else {
                         setTitle(data.title || "");
-                        setShortdesc(data.shortDescription || "");
-                        setFulldesc(data.fullDescription || "");
+                        setShortdesc(data.shortDescription || data.shortdesc || "");
+                        setFulldesc(data.fullDescription || data.fulldesc || "");
                         setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
                         setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
                         setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
                         setLocations(Array.isArray(data.locations) ? data.locations : (typeof data.locations === 'string' ? data.locations.split('\n') : []));
                         setKeywords(Array.isArray(data.keywords) ? data.keywords : (typeof data.keywords === 'string' ? data.keywords.split(',').map((k: string) => k.trim()) : []));
-                        setLoadingChatGPT(false);
+                        setPrice(data.price ? String(data.price) : "");
+                        setCurrency(data.currency || "THB");
+                        setAvailability(data.availability || "");
+                        setMeetingpoint(data.meetingpoint || data.meetingPoint || "");
+                        setImportantinfo(data.importantinfo || data.importantInfo || "");
+                        setOptions(Array.isArray(data.options) ? data.options : []);
                         setStep(4);
                       }
                     } catch (err: any) {
