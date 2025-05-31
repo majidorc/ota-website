@@ -16,7 +16,27 @@ model User {
   name          String?
   password      String
   role          Role      @default(USER)
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())[18:00:34.228] Running build in Washington, D.C., USA (East) – iad1
+[18:00:34.230] Build machine configuration: 2 cores, 8 GB
+[18:00:34.269] Cloning github.com/majidorc/ota-website (Branch: main, Commit: 85ddd73)
+[18:00:34.939] Cloning completed: 670.000ms
+[18:00:35.746] Restored build cache from previous deployment (3GrCBoFWw5YEW6LXEMR55vGspAzU)
+[18:00:36.462] Running "vercel build"
+[18:00:36.912] Vercel CLI 42.2.0
+[18:00:37.197] Installing dependencies...
+[18:00:40.363] 
+[18:00:40.364] > ota-website@0.1.0 postinstall
+[18:00:40.364] > prisma generate && prisma db push
+[18:00:40.364] 
+[18:00:40.376] sh: line 1: prisma: command not found
+[18:00:40.380] npm error code 127
+[18:00:40.381] npm error path /vercel/path0
+[18:00:40.381] npm error command failed
+[18:00:40.381] npm error command sh -c prisma generate && prisma db push
+[18:00:40.381] npm error A complete log of this run can be found in: /vercel/.npm/_logs/2025-05-31T11_00_37_418Z-debug-0.log
+[18:00:40.423] Error: Command "npm install" exited with 127
+[18:00:40.699] 
+[18:00:43.460] Exiting build container
   updatedAt     DateTime  @updatedAt
   bookings      Booking[]
   reviews       Review[]
