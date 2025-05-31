@@ -66,3 +66,10 @@ yarn dev
 
 ## License
 MIT 
+
+## Admin Dashboard Product Creation Workflow
+
+- When you are on `/admin`, clicking **New Product** in the admin menu will replace the product list with the full multi-step product creation form.
+- The form is fully embedded in the main content area (not a modal, not a new route, not an iframe).
+- When you close or submit the form, the product list reappears in the same place.
+- This provides a seamless single-page app experience for product management. 

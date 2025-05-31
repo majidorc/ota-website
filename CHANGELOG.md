@@ -6,6 +6,7 @@
 - Fix: Product creation now saves all fields to the database.
 - Chore: Updated migrations for full product schema.
 - Chore: Updated README for new setup and workflow.
+- Added: New Product form now appears in the main content area of `/admin`, replacing the product list until closed or submitted, without changing the route.
 
 ## [Earlier]
 - Initial project setup with Next.js, Neon Postgres, and admin dashboard. 
