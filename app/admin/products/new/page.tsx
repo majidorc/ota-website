@@ -135,6 +135,8 @@ export default function NewProductForm() {
     </div>
   );
 
+  console.log('Component mounted');
+
   return (
     <div className="flex flex-col md:flex-row w-full max-w-5xl mx-auto bg-white rounded shadow min-h-[700px]">
       {/* Sidebar */}
@@ -367,6 +369,10 @@ export default function NewProductForm() {
             </div>
           </div>
         )}
+        {/* Always-on test submit button for debugging */}
+        <button style={{position: 'fixed', bottom: 20, right: 20, zIndex: 1000, background: 'red', color: 'white', padding: '12px 24px', borderRadius: 8}} onClick={handleSubmit}>
+          TEST SUBMIT
+        </button>
       </div>
     </div>
   );
