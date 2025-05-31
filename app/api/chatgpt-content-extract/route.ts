@@ -14,20 +14,66 @@ export async function POST(req: NextRequest) {
   // Prompt for OpenAI
   const prompt = `Extract the following from the provided activity description:
 - Title (max 60 chars)
-- Short description (2-3 sentences, max 200 chars)
-- Full description (detailed, max 1000 chars)
-- Highlights (3-5 bullet points, each max 80 chars)
-- Inclusions (list, one per line)
-- Exclusions (list, one per line)
-- Locations (list, one per line, if possible)
-- Keywords (list, comma separated, if possible)
-
-Return as JSON with keys: title, shortDescription, fullDescription, highlights, inclusions, exclusions, locations, keywords.
-
-Activity description:
-"""
-${content}
-"""`;
+- Description (max 160 chars)
+- Keywords (max 5, comma-separated)
+- Category (one of: Adventure, Cultural, Nature, Urban, Relaxation)
+- Difficulty (one of: Easy, Moderate, Challenging)
+- Duration (in hours, number only)
+- Price Range (one of: Budget, Moderate, Luxury)
+- Location (city or region name)
+- Best Time to Visit (season or month)
+- Required Items (comma-separated list)
+- Safety Tips (max 3, bullet points)
+- Accessibility (one of: Family-Friendly, Solo Traveler, Group Activity)
+- Environmental Impact (one of: Low, Moderate, High)
+- Local Customs (max 2, bullet points)
+- Photography Tips (max 2, bullet points)
+- Transportation (one of: Public Transport, Private Vehicle, Walking)
+- Booking Requirements (one of: None, Reservation Recommended, Reservation Required)
+- Group Size (one of: Solo, Small Group, Large Group)
+- Language (one of: English, Local Language, Bilingual)
+- Weather Considerations (max 2, bullet points)
+- Return the data in JSON format.
+- Do not include any explanations or additional text.
+- Ensure the JSON is valid and properly formatted.
+- Example format:
+{
+  "title": "Hiking Mount Fuji",
+  "description": "A challenging hike to Japan's highest peak, offering stunning views and a sense of accomplishment.",
+  "keywords": "hiking, mountain, sunrise, nature, challenge",
+  "category": "Adventure",
+  "difficulty": "Challenging",
+  "duration": 8,
+  "priceRange": "Moderate",
+  "location": "Mount Fuji, Japan",
+  "bestTimeToVisit": "July to September",
+  "requiredItems": "hiking boots, water, snacks, warm clothing",
+  "safetyTips": [
+    "Check weather conditions before starting",
+    "Start early to avoid afternoon storms",
+    "Stay on marked trails"
+  ],
+  "accessibility": "Group Activity",
+  "environmentalImpact": "Low",
+  "localCustoms": [
+    "Respect the mountain as a sacred site",
+    "Follow local hiking etiquette"
+  ],
+  "photographyTips": [
+    "Capture the sunrise from the summit",
+    "Use a wide-angle lens for landscape shots"
+  ],
+  "transportation": "Private Vehicle",
+  "bookingRequirements": "Reservation Recommended",
+  "groupSize": "Small Group",
+  "language": "Bilingual",
+  "weatherConsiderations": [
+    "Avoid hiking during typhoon season",
+    "Check for sudden weather changes"
+  ]
+}
+Activity Description:
+"""${content}"""`;
 
   const response = await fetch(
     "https://api.openai.com/v1/chat/completions",
