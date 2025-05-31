@@ -12,7 +12,7 @@ interface Product {
   createdAt: Date;
   updatedAt: Date;
   title?: string;
-  referenceCode?: string;
+  referencecode?: string;
   shortDesc?: string;
   fullDesc?: string;
   highlights?: string[];
@@ -55,8 +55,8 @@ export async function POST(request: Request) {
     const language = formData.get('language') as string;
     const category = formData.get('category') as string;
     const title = formData.get('title') as string;
-    let referenceCode = formData.get('referenceCode') as string;
-    if (!referenceCode) {
+    let referencecode = formData.get('referencecode') as string;
+    if (!referencecode) {
       // Generate reference code: YYMMDD01, YYMMDD02, etc.
       const now = new Date();
       const yy = String(now.getFullYear()).slice(-2);
@@ -65,16 +65,16 @@ export async function POST(request: Request) {
       const prefix = `${yy}${mm}${dd}`;
       // Find the max counter for today
       const { rows } = await pool.query(
-        `SELECT "referenceCode" FROM product WHERE "referenceCode" LIKE $1 ORDER BY "referenceCode" DESC LIMIT 1`,
+        `SELECT "referencecode" FROM product WHERE "referencecode" LIKE $1 ORDER BY "referencecode" DESC LIMIT 1`,
         [`${prefix}%`]
       );
       let counter = 1;
       if (rows.length > 0) {
-        const lastCode = rows[0].referenceCode;
+        const lastCode = rows[0].referencecode;
         const lastCounter = parseInt(lastCode.slice(-2), 10);
         counter = isNaN(lastCounter) ? 1 : lastCounter + 1;
       }
-      referenceCode = `${prefix}${String(counter).padStart(2, '0')}`;
+      referencecode = `${prefix}${String(counter).padStart(2, '0')}`;
     }
     const shortDesc = formData.get('shortDesc') as string;
     const fullDesc = formData.get('fullDesc') as string;
@@ -130,14 +130,14 @@ export async function POST(request: Request) {
     // Insert into database
     const result = await pool.query(
       `INSERT INTO product (
-        id, language, category, title, referenceCode, shortDesc,
+        id, language, category, title, referencecode, shortDesc,
         fullDesc, highlights, locations, keywords, inclusions,
         exclusions, options, price, currency, availability,
         meetingPoint, importantInfo, photos, createdAt, updatedAt
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
       RETURNING id`,
       [
-        id, language, category, title, referenceCode, shortDesc,
+        id, language, category, title, referencecode, shortDesc,
         fullDesc,
         highlights ? highlights : '[]',
         locations ? locations : '[]',
