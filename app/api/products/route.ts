@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import { pool } from '@/lib/db';
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
 
 interface Product {
   id: string;
@@ -28,49 +30,83 @@ interface Product {
 // GET /api/products - List all products
 export async function GET() {
   try {
-    const res = await pool.query<Product>('SELECT * FROM "Product" ORDER BY "createdAt" DESC');
-    return NextResponse.json(res.rows);
+    const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch products' },
+      { status: 500 }
+    );
   }
 }
 
 // POST /api/products - Create a new product
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const data = await req.json();
-    const res = await pool.query<Product>(
-      `INSERT INTO "Product" (
-        name, description, price, image, title, "referenceCode", "shortDesc", "fullDesc", highlights, locations, keywords, inclusions, exclusions, options, currency, availability, "meetingPoint", "importantInfo", "createdAt", "updatedAt"
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW(), NOW()
-      ) RETURNING *`,
+    const formData = await request.formData();
+    
+    // Extract all form fields
+    const language = formData.get('language') as string;
+    const category = formData.get('category') as string;
+    const title = formData.get('title') as string;
+    const referenceCode = formData.get('referenceCode') as string;
+    const shortDesc = formData.get('shortDesc') as string;
+    const fullDesc = formData.get('fullDesc') as string;
+    const highlights = JSON.parse(formData.get('highlights') as string);
+    const locations = JSON.parse(formData.get('locations') as string);
+    const keywords = JSON.parse(formData.get('keywords') as string);
+    const inclusions = formData.get('inclusions') as string;
+    const exclusions = formData.get('exclusions') as string;
+    const options = JSON.parse(formData.get('options') as string);
+    const price = parseFloat(formData.get('price') as string);
+    const currency = formData.get('currency') as string;
+    const availability = formData.get('availability') as string;
+    const meetingPoint = formData.get('meetingPoint') as string;
+    const importantInfo = formData.get('importantInfo') as string;
+
+    // Handle photo uploads
+    const photoUrls: string[] = [];
+    for (let i = 0; formData.has(`photo${i}`); i++) {
+      const photo = formData.get(`photo${i}`) as File;
+      if (photo) {
+        const bytes = await photo.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        
+        // Create a unique filename
+        const filename = `${Date.now()}-${photo.name}`;
+        const path = join(process.cwd(), 'public', 'uploads', filename);
+        
+        // Save the file
+        await writeFile(path, buffer);
+        photoUrls.push(`/uploads/${filename}`);
+      }
+    }
+
+    // Insert into database
+    const result = await pool.query(
+      `INSERT INTO products (
+        language, category, title, reference_code, short_description,
+        full_description, highlights, locations, keywords, inclusions,
+        exclusions, options, price, currency, availability,
+        meeting_point, important_info, photos
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      RETURNING id`,
       [
-        data.title || data.name,
-        data.shortDesc || data.description,
-        data.price,
-        data.image || null,
-        data.title,
-        data.referenceCode,
-        data.shortDesc,
-        data.fullDesc,
-        data.highlights ? JSON.stringify(data.highlights) : null,
-        data.locations ? JSON.stringify(data.locations) : null,
-        data.keywords ? JSON.stringify(data.keywords) : null,
-        data.inclusions,
-        data.exclusions,
-        data.options ? JSON.stringify(data.options) : null,
-        data.currency,
-        data.availability,
-        data.meetingPoint,
-        data.importantInfo
+        language, category, title, referenceCode, shortDesc,
+        fullDesc, highlights, locations, keywords, inclusions,
+        exclusions, options, price, currency, availability,
+        meetingPoint, importantInfo, photoUrls
       ]
     );
-    return NextResponse.json(res.rows[0]);
+
+    return NextResponse.json({ id: result.rows[0].id });
   } catch (error) {
     console.error('Error creating product:', error);
-    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create product' },
+      { status: 500 }
+    );
   }
 }
 

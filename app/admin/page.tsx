@@ -93,14 +93,10 @@ export default function AdminDashboard() {
     setOpenDropdown(openDropdown === tabName ? null : tabName);
   };
 
-  const handleDropdownItemClick = (item: { label: string; href?: string }) => {
-    if (item.label === "New Product") {
-      setShowNewProductForm(true);
-      setOpenDropdown(null);
-    } else if (item.href) {
-      router.push(item.href);
-      setOpenDropdown(null);
-    }
+  const handleNavigation = (href: string) => {
+    setOpenDropdown(null);
+    setMobileMenuOpen(false);
+    router.push(href);
   };
 
   return (
@@ -141,29 +137,23 @@ export default function AdminDashboard() {
                         {tab.name}
                       </button>
                     ) : (
-                      <Link
-                        href={tab.href || '#'}
+                      <button
+                        onClick={() => handleNavigation(tab.href || '#')}
                         className="text-gray-700 font-medium hover:text-blue-600 px-2 py-1"
                       >
                         {tab.name}
-                      </Link>
+                      </button>
                     )}
                     {tab.dropdown && openDropdown === tab.name && (
                       <div className="absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
                         {tab.dropdown.map((item) => (
-                          <Link
+                          <button
                             key={item.label}
-                            href={item.href || '#'}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => {
-                              setOpenDropdown(null);
-                              if (!item.internal) {
-                                window.open(item.href, '_blank');
-                              }
-                            }}
+                            onClick={() => handleNavigation(item.href || '#')}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           >
                             {item.label}
-                          </Link>
+                          </button>
                         ))}
                       </div>
                     )}
@@ -197,25 +187,23 @@ export default function AdminDashboard() {
                           <div className="font-semibold text-gray-900">{tab.name}</div>
                           <div className="ml-4 mt-1 flex flex-col gap-1">
                             {tab.dropdown.map((item) => (
-                              <Link
+                              <button
                                 key={item.label}
-                                href={item.href || '#'}
-                                className="text-sm text-gray-600 hover:text-blue-600"
-                                onClick={() => setMobileMenuOpen(false)}
+                                onClick={() => handleNavigation(item.href || '#')}
+                                className="text-sm text-gray-600 hover:text-blue-600 text-left"
                               >
                                 {item.label}
-                              </Link>
+                              </button>
                             ))}
                           </div>
                         </>
                       ) : (
-                        <Link
-                          href={tab.href || '#'}
+                        <button
+                          onClick={() => handleNavigation(tab.href || '#')}
                           className="text-gray-700 font-medium hover:text-blue-600"
-                          onClick={() => setMobileMenuOpen(false)}
                         >
                           {tab.name}
-                        </Link>
+                        </button>
                       )}
                     </div>
                   ))}

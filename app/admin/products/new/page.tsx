@@ -82,41 +82,44 @@ export default function NewProductForm() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const payload = {
-        language,
-        category,
-        title,
-        referenceCode,
-        shortDesc,
-        fullDesc,
-        highlights,
-        locations,
-        keywords,
-        inclusions: inclusionsText,
-        exclusions: exclusionsText,
-        options,
-        price: parseFloat(price),
-        currency,
-        availability,
-        meetingPoint,
-        importantInfo,
-      };
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const formData = new FormData();
+      formData.append('language', language);
+      formData.append('category', category);
+      formData.append('title', title);
+      formData.append('referenceCode', referenceCode);
+      formData.append('shortDesc', shortDesc);
+      formData.append('fullDesc', fullDesc);
+      formData.append('highlights', JSON.stringify(highlights));
+      formData.append('locations', JSON.stringify(locations));
+      formData.append('keywords', JSON.stringify(keywords));
+      formData.append('inclusions', inclusionsText);
+      formData.append('exclusions', exclusionsText);
+      formData.append('options', JSON.stringify(options));
+      formData.append('price', price);
+      formData.append('currency', currency);
+      formData.append('availability', availability);
+      formData.append('meetingPoint', meetingPoint);
+      formData.append('importantInfo', importantInfo);
+
+      photos.forEach((photo, index) => {
+        formData.append(`photo${index}`, photo);
       });
-      if (!res.ok) {
-        let data;
-        try { data = await res.json(); } catch { data = {}; }
-        setError(data.error || `Failed to create product (status ${res.status})`);
-        setLoading(false);
-        return;
+
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create product');
       }
-      router.push("/admin/products");
-    } catch (err: any) {
-      setError("Failed to create product: " + (err?.message || err));
+
+      router.push('/admin/products');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
       setLoading(false);
     }
   };
@@ -479,6 +482,545 @@ export default function NewProductForm() {
                 onClick={() => setStep(6)}
               >Continue</button>
             </div>
+          </div>
+        )}
+        {/* Step 6: Locations */}
+        {step === 6 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">6</span>
+              <span className="font-semibold">Locations</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Add Locations</label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    placeholder="Enter location"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && locationInput.trim()) {
+                        setLocations([...locations, locationInput.trim()]);
+                        setLocationInput('');
+                      }
+                    }}
+                  />
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      if (locationInput.trim()) {
+                        setLocations([...locations, locationInput.trim()]);
+                        setLocationInput('');
+                      }
+                    }}
+                  >Add</button>
+                </div>
+                <div className="space-y-2">
+                  {locations.map((location, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="flex-1">{location}</span>
+                      <button
+                        className="text-red-600"
+                        onClick={() => setLocations(locations.filter((_, i) => i !== index))}
+                      >Remove</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(5)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(7)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 7: Keywords */}
+        {step === 7 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">7</span>
+              <span className="font-semibold">Keywords</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Add Keywords</label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    placeholder="Enter keyword"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && keywordInput.trim()) {
+                        setKeywords([...keywords, keywordInput.trim()]);
+                        setKeywordInput('');
+                      }
+                    }}
+                  />
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      if (keywordInput.trim()) {
+                        setKeywords([...keywords, keywordInput.trim()]);
+                        setKeywordInput('');
+                      }
+                    }}
+                  >Add</button>
+                </div>
+                <div className="space-y-2">
+                  {keywords.map((keyword, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="flex-1">{keyword}</span>
+                      <button
+                        className="text-red-600"
+                        onClick={() => setKeywords(keywords.filter((_, i) => i !== index))}
+                      >Remove</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(6)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(8)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 8: Inclusions & Exclusions */}
+        {step === 8 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">8</span>
+              <span className="font-semibold">Inclusions & Exclusions</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Inclusions</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={inclusionsText}
+                  onChange={(e) => setInclusionsText(e.target.value)}
+                  placeholder="Enter inclusions (one per line)"
+                  rows={6}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2">Exclusions</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={exclusionsText}
+                  onChange={(e) => setExclusionsText(e.target.value)}
+                  placeholder="Enter exclusions (one per line)"
+                  rows={6}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(7)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(9)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 9: Photos */}
+        {step === 9 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">9</span>
+              <span className="font-semibold">Photos</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Upload Photos</label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setPhotos(Array.from(e.target.files));
+                    }
+                  }}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <div className="mt-4 grid grid-cols-3 gap-4">
+                  {photos.map((photo, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(photo)}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-32 object-cover rounded"
+                      />
+                      <button
+                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full"
+                        onClick={() => setPhotos(photos.filter((_, i) => i !== index))}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(8)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(10)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 10: Options */}
+        {step === 10 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">10</span>
+              <span className="font-semibold">Options</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Add Option</label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={optionName}
+                    onChange={(e) => setOptionName(e.target.value)}
+                    placeholder="Option name"
+                  />
+                  <input
+                    type="text"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={optionDesc}
+                    onChange={(e) => setOptionDesc(e.target.value)}
+                    placeholder="Option description"
+                  />
+                  <button
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      if (optionName.trim() && optionDesc.trim()) {
+                        setOptions([...options, { name: optionName.trim(), description: optionDesc.trim() }]);
+                        setOptionName('');
+                        setOptionDesc('');
+                      }
+                    }}
+                  >Add</button>
+                </div>
+                <div className="space-y-2">
+                  {options.map((option, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="font-semibold">{option.name}</div>
+                        <div className="text-sm text-gray-600">{option.description}</div>
+                      </div>
+                      <button
+                        className="text-red-600"
+                        onClick={() => setOptions(options.filter((_, i) => i !== index))}
+                      >Remove</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(9)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(11)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 11: Pricing */}
+        {step === 11 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">11</span>
+              <span className="font-semibold">Pricing</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Price</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    className="flex-1 border rounded px-3 py-2"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="Enter price"
+                    min="0"
+                    step="0.01"
+                  />
+                  <select
+                    className="border rounded px-3 py-2"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
+                    <option value="THB">THB</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(10)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(12)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 12: Availability */}
+        {step === 12 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">12</span>
+              <span className="font-semibold">Availability</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Availability Information</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={availability}
+                  onChange={(e) => setAvailability(e.target.value)}
+                  placeholder="Enter availability information"
+                  rows={6}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(11)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(13)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 13: Meeting Point */}
+        {step === 13 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">13</span>
+              <span className="font-semibold">Meeting Point</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Meeting Point Information</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={meetingPoint}
+                  onChange={(e) => setMeetingPoint(e.target.value)}
+                  placeholder="Enter meeting point information"
+                  rows={6}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(12)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(14)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 14: Important Info */}
+        {step === 14 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">14</span>
+              <span className="font-semibold">Important Info</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-2">Important Information</label>
+                <textarea
+                  className="w-full border rounded px-3 py-2"
+                  value={importantInfo}
+                  onChange={(e) => setImportantInfo(e.target.value)}
+                  placeholder="Enter important information"
+                  rows={6}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(13)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(15)}
+              >Continue</button>
+            </div>
+          </div>
+        )}
+        {/* Step 15: Review & Submit */}
+        {step === 15 && (
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-blue-600 font-bold">15</span>
+              <span className="font-semibold">Review & Submit</span>
+            </div>
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-semibold mb-2">Basic Information</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p><strong>Language:</strong> {language}</p>
+                  <p><strong>Category:</strong> {category}</p>
+                  <p><strong>Title:</strong> {title}</p>
+                  <p><strong>Reference Code:</strong> {referenceCode}</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Descriptions</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p><strong>Short Description:</strong> {shortDesc}</p>
+                  <p><strong>Full Description:</strong> {fullDesc}</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Highlights</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <ul className="list-disc list-inside">
+                    {highlights.map((highlight, index) => (
+                      <li key={index}>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Locations</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <ul className="list-disc list-inside">
+                    {locations.map((location, index) => (
+                      <li key={index}>{location}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Keywords</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.map((keyword, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{keyword}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Inclusions & Exclusions</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p><strong>Inclusions:</strong></p>
+                  <pre className="whitespace-pre-wrap">{inclusionsText}</pre>
+                  <p><strong>Exclusions:</strong></p>
+                  <pre className="whitespace-pre-wrap">{exclusionsText}</pre>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Photos</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <div className="grid grid-cols-3 gap-4">
+                    {photos.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={URL.createObjectURL(photo)}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-32 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Options</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  {options.map((option, index) => (
+                    <div key={index} className="mb-2">
+                      <p><strong>{option.name}</strong></p>
+                      <p>{option.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Pricing</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p><strong>Price:</strong> {price} {currency}</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Additional Information</h3>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p><strong>Availability:</strong></p>
+                  <pre className="whitespace-pre-wrap">{availability}</pre>
+                  <p><strong>Meeting Point:</strong></p>
+                  <pre className="whitespace-pre-wrap">{meetingPoint}</pre>
+                  <p><strong>Important Info:</strong></p>
+                  <pre className="whitespace-pre-wrap">{importantInfo}</pre>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(14)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+            {error && (
+              <div className="mt-4 bg-red-100 border-l-4 border-red-400 p-4 text-red-700">
+                {error}
+              </div>
+            )}
           </div>
         )}
       </div>
