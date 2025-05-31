@@ -21,8 +21,8 @@ export default function NewProductForm() {
   const [content, setContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [referencecode, setReferencecode] = useState<string>("");
-  const [shortDesc, setShortDesc] = useState<string>("");
-  const [fullDesc, setFullDesc] = useState<string>("");
+  const [shortdesc, setShortdesc] = useState<string>("");
+  const [fulldesc, setFulldesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [highlightInput, setHighlightInput] = useState<string>("");
   const [locations, setLocations] = useState<string[]>([]);
@@ -38,8 +38,8 @@ export default function NewProductForm() {
   const [price, setPrice] = useState<string>("");
   const [currency, setCurrency] = useState<string>("THB");
   const [availability, setAvailability] = useState<string>("");
-  const [meetingPoint, setMeetingPoint] = useState<string>("");
-  const [importantInfo, setImportantInfo] = useState<string>("");
+  const [meetingpoint, setMeetingpoint] = useState<string>("");
+  const [importantinfo, setImportantinfo] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingChatGPT, setLoadingChatGPT] = useState(false);
@@ -89,8 +89,8 @@ export default function NewProductForm() {
       formData.append('category', category);
       formData.append('title', title);
       formData.append('referencecode', referencecode);
-      formData.append('shortDesc', shortDesc);
-      formData.append('fullDesc', fullDesc);
+      formData.append('shortdesc', shortdesc);
+      formData.append('fulldesc', fulldesc);
       formData.append('highlights', JSON.stringify(highlights));
       formData.append('locations', JSON.stringify(locations));
       formData.append('keywords', JSON.stringify(keywords));
@@ -100,8 +100,8 @@ export default function NewProductForm() {
       formData.append('price', price);
       formData.append('currency', currency);
       formData.append('availability', availability);
-      formData.append('meetingPoint', meetingPoint);
-      formData.append('importantInfo', importantInfo);
+      formData.append('meetingpoint', meetingpoint);
+      formData.append('importantinfo', importantinfo);
 
       photos.forEach((photo, index) => {
         formData.append(`photo${index}`, photo);
@@ -332,8 +332,8 @@ export default function NewProductForm() {
                         setChatGPTError("ChatGPT API error: " + data.error + (data.raw ? `\nRaw: ${JSON.stringify(data.raw)}` : ""));
                       } else {
                         setTitle(data.title || "");
-                        setShortDesc(data.shortDescription || "");
-                        setFullDesc(data.fullDescription || "");
+                        setShortdesc(data.shortDescription || "");
+                        setFulldesc(data.fullDescription || "");
                         setHighlights(Array.isArray(data.highlights) ? data.highlights : (typeof data.highlights === 'string' ? data.highlights.split('\n') : []));
                         setInclusionsText(Array.isArray(data.inclusions) ? data.inclusions.join('\n') : (data.inclusions || ""));
                         setExclusionsText(Array.isArray(data.exclusions) ? data.exclusions.join('\n') : (data.exclusions || ""));
@@ -417,8 +417,8 @@ export default function NewProductForm() {
                 <label className="block font-semibold mb-2">Short Description</label>
                 <textarea
                   className="w-full border rounded px-3 py-2"
-                  value={shortDesc}
-                  onChange={(e) => setShortDesc(e.target.value)}
+                  value={shortdesc}
+                  onChange={(e) => setShortdesc(e.target.value)}
                   placeholder="Enter short description"
                   rows={3}
                 />
@@ -427,8 +427,8 @@ export default function NewProductForm() {
                 <label className="block font-semibold mb-2">Full Description</label>
                 <textarea
                   className="w-full border rounded px-3 py-2"
-                  value={fullDesc}
-                  onChange={(e) => setFullDesc(e.target.value)}
+                  value={fulldesc}
+                  onChange={(e) => setFulldesc(e.target.value)}
                   placeholder="Enter full description"
                   rows={6}
                 />
@@ -846,8 +846,8 @@ export default function NewProductForm() {
                 <label className="block font-semibold mb-2">Meeting Point Information</label>
                 <textarea
                   className="w-full border rounded px-3 py-2"
-                  value={meetingPoint}
-                  onChange={(e) => setMeetingPoint(e.target.value)}
+                  value={meetingpoint}
+                  onChange={(e) => setMeetingpoint(e.target.value)}
                   placeholder="Enter meeting point information"
                   rows={6}
                 />
@@ -877,8 +877,8 @@ export default function NewProductForm() {
                 <label className="block font-semibold mb-2">Important Information</label>
                 <textarea
                   className="w-full border rounded px-3 py-2"
-                  value={importantInfo}
-                  onChange={(e) => setImportantInfo(e.target.value)}
+                  value={importantinfo}
+                  onChange={(e) => setImportantinfo(e.target.value)}
                   placeholder="Enter important information"
                   rows={6}
                 />
@@ -916,8 +916,8 @@ export default function NewProductForm() {
               <div>
                 <h3 className="font-semibold mb-2">Descriptions</h3>
                 <div className="bg-gray-50 p-4 rounded">
-                  <p><strong>Short Description:</strong> {shortDesc}</p>
-                  <p><strong>Full Description:</strong> {fullDesc}</p>
+                  <p><strong>Short Description:</strong> {shortdesc}</p>
+                  <p><strong>Full Description:</strong> {fulldesc}</p>
                 </div>
               </div>
               <div>
@@ -997,9 +997,9 @@ export default function NewProductForm() {
                   <p><strong>Availability:</strong></p>
                   <pre className="whitespace-pre-wrap">{availability}</pre>
                   <p><strong>Meeting Point:</strong></p>
-                  <pre className="whitespace-pre-wrap">{meetingPoint}</pre>
+                  <pre className="whitespace-pre-wrap">{meetingpoint}</pre>
                   <p><strong>Important Info:</strong></p>
-                  <pre className="whitespace-pre-wrap">{importantInfo}</pre>
+                  <pre className="whitespace-pre-wrap">{importantinfo}</pre>
                 </div>
               </div>
             </div>

@@ -17,8 +17,8 @@ interface Product {
   id: string;
   title: string;
   referencecode?: string;
-  shortDesc?: string;
-  longDesc?: string;
+  shortdesc?: string;
+  longdesc?: string;
   photos?: string[];
   status?: string;
   price?: number;
@@ -187,9 +187,9 @@ export default function ProductDetails({ params }: { params: { id: string } }) {
               <div className="font-bold text-lg mb-1">Title</div>
               <div className="mb-4">{product.title}</div>
               <div className="font-bold mb-1">Short description</div>
-              <div className="mb-4">{product.shortDesc}</div>
+              <div className="mb-4">{product.shortdesc}</div>
               <div className="font-bold mb-1">Long description</div>
-              <div className="mb-4 whitespace-pre-line">{product.longDesc}</div>
+              <div className="mb-4 whitespace-pre-line">{product.longdesc}</div>
             </div>
             <Link href={`/admin/products/${product.id}/edit`} className="ml-6 bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 h-10">Edit product</Link>
           </div>

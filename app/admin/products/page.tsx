@@ -6,7 +6,7 @@ interface Product {
   id: string;
   title: string;
   referencecode?: string;
-  shortDesc?: string;
+  shortdesc?: string;
   photos?: string[];
   status?: string;
   price?: number;
@@ -101,7 +101,7 @@ export default function ManageProducts() {
                     />
                     <div>
                       <div className="font-semibold">{product.title}</div>
-                      <div className="text-xs text-gray-500">{product.shortDesc}</div>
+                      <div className="text-xs text-gray-500">{product.shortdesc}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.referencecode}</td>

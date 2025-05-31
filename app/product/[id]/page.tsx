@@ -7,8 +7,8 @@ interface Product {
   id: string;
   title: string;
   referencecode?: string;
-  shortDesc?: string;
-  fullDesc?: string;
+  shortdesc?: string;
+  fulldesc?: string;
   highlights?: string[];
   photos?: string[];
   status?: string;
@@ -17,8 +17,8 @@ interface Product {
   inclusions?: string;
   exclusions?: string;
   notAvailableFor?: string;
-  meetingPoint?: string;
-  importantInfo?: string;
+  meetingpoint?: string;
+  importantinfo?: string;
 }
 
 export default function ProductDetailPage() {
@@ -73,7 +73,7 @@ export default function ProductDetailPage() {
           <button className="bg-blue-600 text-white px-6 py-2 rounded font-semibold">Check availability</button>
         </div>
         {/* Short Description */}
-        {product.shortDesc && <p className="mb-4 text-lg text-gray-700">{product.shortDesc}</p>}
+        {product.shortdesc && <p className="mb-4 text-lg text-gray-700">{product.shortdesc}</p>}
         {/* Highlights */}
         {product.highlights && product.highlights.length > 0 && (
           <div className="mb-6">
@@ -84,10 +84,10 @@ export default function ProductDetailPage() {
           </div>
         )}
         {/* Full Description */}
-        {product.fullDesc && (
+        {product.fulldesc && (
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-2">Full Description</h2>
-            <p className="text-gray-700 whitespace-pre-line">{product.fullDesc}</p>
+            <p className="text-gray-700 whitespace-pre-line">{product.fulldesc}</p>
           </div>
         )}
         {/* Includes & Excludes */}
@@ -106,17 +106,17 @@ export default function ProductDetailPage() {
           </div>
         )}
         {/* Meeting point */}
-        {product.meetingPoint && (
+        {product.meetingpoint && (
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-2">Meeting point</h2>
-            <p className="text-gray-700">{product.meetingPoint}</p>
+            <p className="text-gray-700">{product.meetingpoint}</p>
           </div>
         )}
         {/* Important info */}
-        {product.importantInfo && (
+        {product.importantinfo && (
           <div className="mb-6">
             <h2 className="font-bold text-lg mb-2">Important information</h2>
-            <p className="text-gray-700">{product.importantInfo}</p>
+            <p className="text-gray-700">{product.importantinfo}</p>
           </div>
         )}
         {/* Placeholder for related products or recommendations */}

@@ -19,8 +19,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
   const [category, setCategory] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [referencecode, setReferencecode] = useState<string>("");
-  const [shortDesc, setShortDesc] = useState<string>("");
-  const [fullDesc, setFullDesc] = useState<string>("");
+  const [shortdesc, setShortdesc] = useState<string>("");
+  const [fulldesc, setFulldesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -30,8 +30,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
   const [price, setPrice] = useState<string>("");
   const [currency, setCurrency] = useState<string>("THB");
   const [availability, setAvailability] = useState<string>("");
-  const [meetingPoint, setMeetingPoint] = useState<string>("");
-  const [importantInfo, setImportantInfo] = useState<string>("");
+  const [meetingpoint, setMeetingpoint] = useState<string>("");
+  const [importantinfo, setImportantinfo] = useState<string>("");
   const [photos, setPhotos] = useState<string[]>([]); // URLs only for edit
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,8 +68,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
         setCategory(data.category || "");
         setTitle(data.title || "");
         setReferencecode(data.referencecode || "");
-        setShortDesc(data.shortDesc || "");
-        setFullDesc(data.fullDesc || "");
+        setShortdesc(data.shortdesc || "");
+        setFulldesc(data.fulldesc || "");
         setHighlights(Array.isArray(data.highlights) ? data.highlights : []);
         setLocations(Array.isArray(data.locations) ? data.locations : []);
         setKeywords(Array.isArray(data.keywords) ? data.keywords : []);
@@ -79,8 +79,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
         setPrice(data.price ? String(data.price) : "");
         setCurrency(data.currency || "THB");
         setAvailability(data.availability || "");
-        setMeetingPoint(data.meetingPoint || "");
-        setImportantInfo(data.importantInfo || "");
+        setMeetingpoint(data.meetingpoint || "");
+        setImportantinfo(data.importantinfo || "");
         setPhotos(Array.isArray(data.photos) ? data.photos : []);
         setLoading(false);
       })
@@ -98,9 +98,9 @@ export default function EditProductForm({ productId }: { productId: string }) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          language, category, title, referencecode, shortDesc, fullDesc,
+          language, category, title, referencecode, shortdesc, fulldesc,
           highlights, locations, keywords, inclusions: inclusionsText, exclusions: exclusionsText,
-          options, price: parseFloat(price), currency, availability, meetingPoint, importantInfo, photos
+          options, price: parseFloat(price), currency, availability, meetingpoint, importantinfo, photos
         }),
       });
       if (!res.ok) throw new Error("Failed to update product");
@@ -191,15 +191,15 @@ export default function EditProductForm({ productId }: { productId: string }) {
             <label className="block font-semibold mb-2">Short Description</label>
             <textarea
               className="w-full border rounded px-3 py-2 mb-4"
-              value={shortDesc}
-              onChange={e => setShortDesc(e.target.value)}
+              value={shortdesc}
+              onChange={e => setShortdesc(e.target.value)}
               rows={3}
             />
             <label className="block font-semibold mb-2">Full Description</label>
             <textarea
               className="w-full border rounded px-3 py-2 mb-4"
-              value={fullDesc}
-              onChange={e => setFullDesc(e.target.value)}
+              value={fulldesc}
+              onChange={e => setFulldesc(e.target.value)}
               rows={6}
             />
             <label className="block font-semibold mb-2">Highlights</label>
@@ -395,8 +395,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
             <h2 className="text-xl font-bold mb-4">Meeting Point</h2>
             <textarea
               className="w-full border rounded px-3 py-2 mb-4"
-              value={meetingPoint}
-              onChange={e => setMeetingPoint(e.target.value)}
+              value={meetingpoint}
+              onChange={e => setMeetingpoint(e.target.value)}
               rows={2}
             />
           </div>
@@ -407,8 +407,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
             <h2 className="text-xl font-bold mb-4">Important Info</h2>
             <textarea
               className="w-full border rounded px-3 py-2 mb-4"
-              value={importantInfo}
-              onChange={e => setImportantInfo(e.target.value)}
+              value={importantinfo}
+              onChange={e => setImportantinfo(e.target.value)}
               rows={4}
             />
           </div>
@@ -422,8 +422,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
               <div><strong>Category:</strong> {category}</div>
               <div><strong>Title:</strong> {title}</div>
               <div><strong>Reference Code:</strong> {referencecode}</div>
-              <div><strong>Short Desc:</strong> {shortDesc}</div>
-              <div><strong>Full Desc:</strong> {fullDesc}</div>
+              <div><strong>Short Desc:</strong> {shortdesc}</div>
+              <div><strong>Full Desc:</strong> {fulldesc}</div>
               <div><strong>Highlights:</strong> {highlights.join(', ')}</div>
               <div><strong>Locations:</strong> {locations.join(', ')}</div>
               <div><strong>Keywords:</strong> {keywords.join(', ')}</div>
@@ -432,8 +432,8 @@ export default function EditProductForm({ productId }: { productId: string }) {
               <div><strong>Options:</strong> {options.map(o => o.name).join(', ')}</div>
               <div><strong>Price:</strong> {price} {currency}</div>
               <div><strong>Availability:</strong> {availability}</div>
-              <div><strong>Meeting Point:</strong> {meetingPoint}</div>
-              <div><strong>Important Info:</strong> {importantInfo}</div>
+              <div><strong>Meeting Point:</strong> {meetingpoint}</div>
+              <div><strong>Important Info:</strong> {importantinfo}</div>
             </div>
             <button
               className="bg-blue-600 text-white px-6 py-2 rounded font-semibold mt-6"
