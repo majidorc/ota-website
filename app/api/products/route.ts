@@ -50,8 +50,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    
-    // Extract all form fields
+    // Extract all form fields (all lowercase)
     const language = formData.get('language') as string;
     const category = formData.get('category') as string;
     const title = formData.get('title') as string;
@@ -65,31 +64,31 @@ export async function POST(request: Request) {
       const prefix = `${yy}${mm}${dd}`;
       // Find the max counter for today
       const { rows } = await pool.query(
-        `SELECT "referencecode" FROM product WHERE "referencecode" LIKE $1 ORDER BY "referencecode" DESC LIMIT 1`,
+        `SELECT referencecode FROM product WHERE referencecode LIKE $1 ORDER BY referencecode DESC LIMIT 1`,
         [`${prefix}%`]
       );
       let counter = 1;
-      if (rows.length > 0) {
+      if (rows.length > 0 && typeof rows[0].referencecode === 'string') {
         const lastCode = rows[0].referencecode;
         const lastCounter = parseInt(lastCode.slice(-2), 10);
         counter = isNaN(lastCounter) ? 1 : lastCounter + 1;
       }
       referencecode = `${prefix}${String(counter).padStart(2, '0')}`;
     }
-    const shortDesc = formData.get('shortDesc') as string;
-    const fullDesc = formData.get('fullDesc') as string;
-    const highlights = formData.get('highlights') as string;
-    const locations = formData.get('locations') as string;
-    const keywords = formData.get('keywords') as string;
+    const shortdesc = formData.get('shortdesc') as string;
+    const fulldesc = formData.get('fulldesc') as string;
+    // Parse JSON fields
+    const highlights = formData.get('highlights') ? JSON.parse(formData.get('highlights') as string) : [];
+    const locations = formData.get('locations') ? JSON.parse(formData.get('locations') as string) : [];
+    const keywords = formData.get('keywords') ? JSON.parse(formData.get('keywords') as string) : [];
     const inclusions = formData.get('inclusions') as string;
     const exclusions = formData.get('exclusions') as string;
-    const options = formData.get('options') as string;
+    const options = formData.get('options') ? JSON.parse(formData.get('options') as string) : [];
     const price = parseFloat(formData.get('price') as string);
     const currency = formData.get('currency') as string;
     const availability = formData.get('availability') as string;
-    const meetingPoint = formData.get('meetingPoint') as string;
-    const importantInfo = formData.get('importantInfo') as string;
-
+    const meetingpoint = formData.get('meetingpoint') as string;
+    const importantinfo = formData.get('importantinfo') as string;
     // Handle photo uploads
     const photoUrls: string[] = [];
     for (let i = 0; formData.has(`photo${i}`); i++) {
@@ -97,60 +96,52 @@ export async function POST(request: Request) {
       if (photo) {
         const bytes = await photo.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        
-        // Create a unique filename
         const filename = `${Date.now()}-${photo.name}`;
         const path = join(process.cwd(), 'public', 'uploads', filename);
-        
-        // Save the file
         await writeFile(path, buffer);
         photoUrls.push(`/uploads/${filename}`);
       }
     }
-
     // Generate product id: YYMMDD01, YYMMDD02, etc.
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     const prefix = `${yy}${mm}${dd}`;
-    // Find the max counter for today
     const { rows: idRows } = await pool.query(
       `SELECT id FROM product WHERE id::text LIKE $1 ORDER BY id DESC LIMIT 1`,
       [`${prefix}%`]
     );
     let idCounter = 1;
-    if (idRows.length > 0) {
+    if (idRows.length > 0 && typeof idRows[0].id === 'string') {
       const lastId = idRows[0].id;
       const lastCounter = parseInt(lastId.slice(-2), 10);
       idCounter = isNaN(lastCounter) ? 1 : lastCounter + 1;
     }
     const id = `${prefix}${String(idCounter).padStart(2, '0')}`;
-
-    // Insert into database
+    // Insert into database (all lowercase fields)
     const result = await pool.query(
       `INSERT INTO product (
-        id, language, category, title, referencecode, shortDesc,
-        fullDesc, highlights, locations, keywords, inclusions,
+        id, language, category, title, referencecode, shortdesc,
+        fulldesc, highlights, locations, keywords, inclusions,
         exclusions, options, price, currency, availability,
-        meetingPoint, importantInfo, photos, createdAt, updatedAt
+        meetingpoint, importantinfo, photos, createdat, updatedat
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
       RETURNING id`,
       [
-        id, language, category, title, referencecode, shortDesc,
-        fullDesc,
-        highlights ? highlights : '[]',
-        locations ? locations : '[]',
-        keywords ? keywords : '[]',
+        id, language, category, title, referencecode, shortdesc,
+        fulldesc,
+        JSON.stringify(highlights),
+        JSON.stringify(locations),
+        JSON.stringify(keywords),
         inclusions,
         exclusions,
-        options ? options : '[]',
+        JSON.stringify(options),
         price, currency, availability,
-        meetingPoint, importantInfo,
+        meetingpoint, importantinfo,
         JSON.stringify(photoUrls)
       ]
     );
-
     return NextResponse.json({ id: result.rows[0].id });
   } catch (error) {
     console.error('Error creating product:', error);
