@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     const prefix = `${yy}${mm}${dd}`;
     // Find the max counter for today
     const { rows: idRows } = await pool.query(
-      `SELECT id FROM product WHERE id LIKE $1 ORDER BY id DESC LIMIT 1`,
+      `SELECT id FROM product WHERE id::text LIKE $1 ORDER BY id DESC LIMIT 1`,
       [`${prefix}%`]
     );
     let idCounter = 1;
