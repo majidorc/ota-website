@@ -28,6 +28,12 @@ type OptionType = {
   description?: string;
 };
 
+type OptionFormProps = {
+  initialData: Partial<OptionType> | null;
+  onSave: (opt: OptionType) => void;
+  onCancel: () => void;
+};
+
 export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [step, setStep] = useState<number>(1);
   const [language, setLanguage] = useState<string>("");
@@ -312,7 +318,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   );
 }
 
-function OptionForm({ initialData, onSave, onCancel }) {
+function OptionForm({ initialData, onSave, onCancel }: OptionFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [referencecode, setReferencecode] = useState(initialData?.referencecode || '');
   const [groupsize, setGroupsize] = useState(initialData?.groupsize || '');
