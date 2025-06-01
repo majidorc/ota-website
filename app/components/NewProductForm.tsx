@@ -276,10 +276,15 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
             <OptionForm
               initialData={optionSubStep.data}
               onSave={opt => {
+                const optionObj = {
+                  ...opt,
+                  name: opt.title || opt.name || '',
+                  description: opt.description || '',
+                };
                 if (optionSubStep.index === null) {
-                  setOptions([...options, opt]);
+                  setOptions([...options, optionObj]);
                 } else {
-                  setOptions(options.map((o, i) => i === optionSubStep.index ? opt : o));
+                  setOptions(options.map((o, i) => i === optionSubStep.index ? optionObj : o));
                 }
                 setOptionSubStep(null);
               }}
