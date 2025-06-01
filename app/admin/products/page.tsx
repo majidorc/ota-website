@@ -115,6 +115,13 @@ export default function ManageProducts() {
                   </td>
                   <td>
                     <Link
+                      href={`/products/${product.id}`}
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 mr-2"
+                      target="_blank"
+                    >
+                      View
+                    </Link>
+                    <Link
                       href={`/admin/products/${product.id}/edit`}
                       className="text-blue-600 hover:underline mr-4"
                     >
@@ -125,21 +132,23 @@ export default function ManageProducts() {
                       onClick={async () => {
                         if (confirm('Are you sure you want to delete this product?')) {
                           try {
-                            const res = await fetch(`/api/products/${product.id}`, {
+                            const response = await fetch('/api/products', {
                               method: 'DELETE',
                               headers: {
                                 'Content-Type': 'application/json',
-                              }
+                              },
+                              body: JSON.stringify({ id: product.id }),
                             });
-                            if (res.ok) {
-                              setProducts(products.filter(p => p.id !== product.id));
-                            } else {
-                              const error = await res.json();
-                              alert(error.error || 'Failed to delete product');
+
+                            if (!response.ok) {
+                              const errorData = await response.json();
+                              throw new Error(errorData.error || 'Failed to delete product');
                             }
-                          } catch (err) {
-                            console.error('Error deleting product:', err);
-                            alert('Failed to delete product');
+
+                            setProducts(products.filter(p => p.id !== product.id));
+                          } catch (error) {
+                            console.error('Error deleting product:', error);
+                            alert('Failed to delete product. Please try again.');
                           }
                         }
                       }}
