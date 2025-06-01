@@ -244,7 +244,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
                   <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
                     <div className="text-left">
                       <div className="font-semibold">{option.name}</div>
-                      <div className="text-sm text-gray-600">Ref: {option.referenceCode || option.referencecode || '-'}</div>
+                      <div className="text-sm text-gray-600">Ref: {(option as any).referenceCode || (option as any).referencecode || '-'}</div>
                       <div className="text-xs text-gray-400">Group size: {option.groupSize || '-'}, Type: {option.isPrivate ? 'Private' : 'Non-private'}</div>
                     </div>
                     <button
@@ -257,7 +257,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
               </div>
               <button
                 className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold hover:bg-blue-50 transition mb-4"
-                onClick={() => setOptionSubStep({ index: null, data: null })}
+                onClick={() => setOptionSubStep(null)}
                 type="button"
               >Create new option</button>
               <div className="flex justify-between mt-6 w-full max-w-md mx-auto">
