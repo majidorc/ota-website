@@ -46,6 +46,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [loadingChatGPT, setLoadingChatGPT] = useState(false);
   const [chatGPTError, setChatGPTError] = useState<string | null>(null);
   const [showOptionForm, setShowOptionForm] = useState(false);
+  const [optionSubStep, setOptionSubStep] = useState<null | { index: number | null, data: any }>(null);
   const router = useRouter();
 
   const steps = [
@@ -219,98 +220,143 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       {/* Step 10: Options */}
       {step === 10 && (
         <div className="max-w-xl mx-auto flex flex-col items-center text-center">
-          <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 justify-center">
-            Add option(s) to your product
-            <span title="Options allow you to customize your activity and attract more customers.">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16v-4m0-4h.01" /></svg>
-            </span>
-          </h2>
-          <p className="mb-4 text-gray-700">Options allow you to customize your activity and attract more customers. For example, your options can have different:</p>
-          <ul className="text-left mb-4 text-gray-700 list-disc list-inside mx-auto max-w-md">
-            <li>Durations (1 or 2 hours)</li>
-            <li>Group sizes (10 or 20 people) or set-ups (private or public)</li>
-            <li>Languages (English or Spanish)</li>
-            <li>Inclusions (with or without lunch)</li>
-            <li>Ways to start the activity (meeting point or hotel pickup)</li>
-          </ul>
-          <p className="mb-6 text-gray-700 text-sm">The option is where the pricing/availability are stored, and where bookings are made. So you need at least one option per product to start receiving bookings.</p>
-          {/* Create new option button and form */}
-          <div className="mb-6">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold hover:bg-blue-50 transition mb-4"
-              onClick={() => setShowOptionForm(true)}
-              type="button"
-            >Create new option</button>
-            {showOptionForm && (
-              <div className="flex flex-col md:flex-row gap-2 items-center justify-center mb-2">
-                <input
-                  type="text"
-                  className="flex-1 border rounded px-3 py-2"
-                  value={optionName}
-                  onChange={(e) => setOptionName(e.target.value)}
-                  placeholder="Option name (e.g. 2-hour tour, Private group)"
-                />
-                <input
-                  type="text"
-                  className="flex-1 border rounded px-3 py-2"
-                  value={optionDesc}
-                  onChange={(e) => setOptionDesc(e.target.value)}
-                  placeholder="Option description (optional)"
-                />
-                <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
-                  onClick={() => {
-                    if (optionName.trim()) {
-                      setOptions([...options, { name: optionName.trim(), description: optionDesc.trim() }]);
-                      setOptionName('');
-                      setOptionDesc('');
-                      setShowOptionForm(false);
-                    }
-                  }}
-                  type="button"
-                >Add</button>
-                <button
-                  className="text-gray-500 hover:text-red-600 ml-2"
-                  onClick={() => {
-                    setShowOptionForm(false);
-                    setOptionName('');
-                    setOptionDesc('');
-                  }}
-                  type="button"
-                >Cancel</button>
+          {!optionSubStep ? (
+            <>
+              <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 justify-center">
+                Add option(s) to your product
+                <span title="Options allow you to customize your activity and attract more customers.">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16v-4m0-4h.01" /></svg>
+                </span>
+              </h2>
+              <p className="mb-4 text-gray-700">Options allow you to customize your activity and attract more customers. For example, your options can have different:</p>
+              <ul className="text-left mb-4 text-gray-700 list-disc list-inside mx-auto max-w-md">
+                <li>Durations (1 or 2 hours)</li>
+                <li>Group sizes (10 or 20 people) or set-ups (private or public)</li>
+                <li>Languages (English or Spanish)</li>
+                <li>Inclusions (with or without lunch)</li>
+                <li>Ways to start the activity (meeting point or hotel pickup)</li>
+              </ul>
+              <p className="mb-6 text-gray-700 text-sm">The option is where the pricing/availability are stored, and where bookings are made. So you need at least one option per product to start receiving bookings.</p>
+              {/* List of added options */}
+              <div className="w-full max-w-md mx-auto mb-6">
+                {options.length === 0 && <div className="text-gray-400 italic">No options added yet.</div>}
+                {options.map((option, index) => (
+                  <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
+                    <div className="text-left">
+                      <div className="font-semibold">{option.title || option.name}</div>
+                      <div className="text-sm text-gray-600">Ref: {option.referenceCode || option.referencecode || '-'}</div>
+                      <div className="text-xs text-gray-400">Group size: {option.groupSize || '-'}, Type: {option.isPrivate ? 'Private' : 'Non-private'}</div>
+                    </div>
+                    <button
+                      className="border border-blue-600 text-blue-600 px-4 py-1 rounded font-semibold ml-4"
+                      onClick={() => setOptionSubStep({ index, data: option })}
+                      type="button"
+                    >Edit</button>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-          {/* List of added options */}
-          <div className="w-full max-w-md mx-auto mb-6">
-            {options.length === 0 && <div className="text-gray-400 italic">No options added yet.</div>}
-            {options.map((option, index) => (
-              <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
-                <div className="text-left">
-                  <div className="font-semibold">{option.name}</div>
-                  {option.description && <div className="text-sm text-gray-600">{option.description}</div>}
-                </div>
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold hover:bg-blue-50 transition mb-4"
+                onClick={() => setOptionSubStep({ index: null, data: null })}
+                type="button"
+              >Create new option</button>
+              <div className="flex justify-between mt-6 w-full max-w-md mx-auto">
                 <button
-                  className="text-red-600 font-semibold ml-4"
-                  onClick={() => setOptions(options.filter((_, i) => i !== index))}
-                  type="button"
-                >Remove</button>
+                  className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                  onClick={() => setStep(9)}
+                >Back</button>
+                <button
+                  className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                  onClick={() => setStep(11)}
+                  disabled={options.length === 0}
+                >Continue</button>
               </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-6 w-full max-w-md mx-auto">
-            <button
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(9)}
-            >Back</button>
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
-              onClick={() => setStep(11)}
-              disabled={options.length === 0}
-            >Continue</button>
-          </div>
+            </>
+          ) : (
+            <OptionForm
+              initialData={optionSubStep.data}
+              onSave={opt => {
+                if (optionSubStep.index === null) {
+                  setOptions([...options, opt]);
+                } else {
+                  setOptions(options.map((o, i) => i === optionSubStep.index ? opt : o));
+                }
+                setOptionSubStep(null);
+              }}
+              onCancel={() => setOptionSubStep(null)}
+            />
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+function OptionForm({ initialData, onSave, onCancel }) {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [referenceCode, setReferenceCode] = useState(initialData?.referenceCode || '');
+  const [groupSize, setGroupSize] = useState(initialData?.groupSize || '');
+  const [languages, setLanguages] = useState(initialData?.languages || []);
+  const [isPrivate, setIsPrivate] = useState(initialData?.isPrivate || false);
+  const [accessible, setAccessible] = useState(initialData?.accessible || false);
+  const [status, setStatus] = useState(initialData?.status || 'Temporary');
+  const [bookingEngine, setBookingEngine] = useState(initialData?.bookingEngine || 'Automatically accept new bookings');
+  const [cutoffTime, setCutoffTime] = useState(initialData?.cutoffTime || '');
+  const [type, setType] = useState(initialData?.type || 'Non-private');
+
+  return (
+    <form className="bg-white border rounded p-6 w-full max-w-lg mx-auto text-left">
+      <h3 className="text-xl font-bold mb-4">Option setup</h3>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Title</label>
+        <input className="w-full border rounded px-3 py-2" value={title} onChange={e => setTitle(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Reference code</label>
+        <input className="w-full border rounded px-3 py-2" value={referenceCode} onChange={e => setReferenceCode(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Maximum group size</label>
+        <input className="w-full border rounded px-3 py-2" type="number" value={groupSize} onChange={e => setGroupSize(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Languages</label>
+        <input className="w-full border rounded px-3 py-2" value={languages.join(', ')} onChange={e => setLanguages(e.target.value.split(','))} placeholder="e.g. English, Spanish" />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Is this a private activity?</label>
+        <div className="flex gap-4 mt-1">
+          <label><input type="radio" checked={!isPrivate} onChange={() => setIsPrivate(false)} /> No</label>
+          <label><input type="radio" checked={isPrivate} onChange={() => setIsPrivate(true)} /> Yes</label>
+        </div>
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Is the activity wheelchair accessible?</label>
+        <div className="flex gap-4 mt-1">
+          <label><input type="radio" checked={!accessible} onChange={() => setAccessible(false)} /> No</label>
+          <label><input type="radio" checked={accessible} onChange={() => setAccessible(true)} /> Yes</label>
+        </div>
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Status</label>
+        <input className="w-full border rounded px-3 py-2" value={status} onChange={e => setStatus(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Booking Engine</label>
+        <input className="w-full border rounded px-3 py-2" value={bookingEngine} onChange={e => setBookingEngine(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Cut-off time</label>
+        <input className="w-full border rounded px-3 py-2" value={cutoffTime} onChange={e => setCutoffTime(e.target.value)} />
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Type</label>
+        <input className="w-full border rounded px-3 py-2" value={type} onChange={e => setType(e.target.value)} />
+      </div>
+      <div className="flex justify-between mt-6">
+        <button type="button" className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={onCancel}>Cancel</button>
+        <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => onSave({ title, referenceCode, groupSize, languages, isPrivate, accessible, status, bookingEngine, cutoffTime, type })}>Save</button>
+      </div>
+    </form>
   );
 } 
