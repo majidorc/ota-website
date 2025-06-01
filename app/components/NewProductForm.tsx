@@ -113,13 +113,18 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
     try {
       // Save all locations to /api/cities
       console.log('Starting to save cities:', locations);
+      const savedCities = [];
+      
       for (const city of locations) {
         try {
           console.log('Attempting to save city:', city);
           const res = await fetch('/api/cities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: city.name }),
+            body: JSON.stringify({ 
+              name: city.name,
+              country: city.country || null 
+            }),
           });
           
           if (!res.ok) {
@@ -130,12 +135,13 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
           
           const data = await res.json();
           console.log('Successfully saved city:', data);
+          savedCities.push(data);
         } catch (err) {
           console.error('Error in city save loop:', err);
-          throw err; // Re-throw to be caught by outer try-catch
+          throw err;
         }
       }
-      console.log('All cities saved successfully');
+      console.log('All cities saved successfully:', savedCities);
 
       const formData = new FormData();
       formData.append('language', language);
@@ -145,7 +151,11 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       formData.append('shortDesc', shortDesc);
       formData.append('fullDesc', fullDesc);
       formData.append('highlights', JSON.stringify(highlights));
-      formData.append('locations', JSON.stringify(locations.map(l => l.name)));
+      formData.append('locations', JSON.stringify(savedCities.map(city => ({
+        id: city.id,
+        name: city.name,
+        country: city.country
+      }))));
       formData.append('keywords', JSON.stringify(keywords));
       formData.append('inclusions', inclusionsText);
       formData.append('exclusions', exclusionsText);
@@ -158,19 +168,25 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       photos.forEach((photo, index) => {
         formData.append(`photo${index}`, photo);
       });
+
+      console.log('Submitting form data with locations:', savedCities);
       const response = await fetch('/api/products', {
         method: 'POST',
         body: formData,
       });
+
       if (!response.ok) {
-        throw new Error('Failed to create product');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create product');
       }
+
       if (onClose) {
         onClose();
       } else {
         router.push('/admin/products');
       }
     } catch (err) {
+      console.error('Error in form submission:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

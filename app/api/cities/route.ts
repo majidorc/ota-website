@@ -4,7 +4,8 @@ import pool from '@/lib/db';
 // Ensure cities table exists
 async function ensureCitiesTable() {
   try {
-    await pool.query(`
+    console.log('Checking if cities table exists...');
+    const result = await pool.query(`
       CREATE TABLE IF NOT EXISTS cities (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -15,6 +16,8 @@ async function ensureCitiesTable() {
       
       CREATE INDEX IF NOT EXISTS cities_name_idx ON cities (LOWER(name));
     `);
+    console.log('Cities table check/creation completed');
+    return result;
   } catch (err) {
     console.error('Error ensuring cities table:', err);
     throw err;
@@ -43,9 +46,14 @@ export async function GET(req: NextRequest) {
 // POST /api/cities { name, country }
 export async function POST(req: NextRequest) {
   try {
+    console.log('Starting POST request to /api/cities');
     await ensureCitiesTable();
-    const { name, country } = await req.json();
-    console.log('Adding city:', { name, country });
+    
+    const body = await req.json();
+    console.log('Received request body:', body);
+    
+    const { name, country } = body;
+    console.log('Extracted name and country:', { name, country });
     
     if (!name || typeof name !== 'string') {
       console.error('Invalid city name:', name);
@@ -53,6 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if city exists
+    console.log('Checking if city exists:', name);
     const exists = await pool.query('SELECT id FROM cities WHERE LOWER(name) = $1', [name.toLowerCase()]);
     console.log('City exists check result:', exists.rows);
     
@@ -62,14 +71,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert new city
+    console.log('Attempting to insert new city:', { name, country });
     const insert = await pool.query(
       'INSERT INTO cities (name, country) VALUES ($1, $2) RETURNING id, name, country',
       [name, country || null]
     );
-    console.log('Added new city:', insert.rows[0]);
+    console.log('Successfully inserted city:', insert.rows[0]);
     return NextResponse.json(insert.rows[0]);
   } catch (err) {
-    console.error('Error adding city:', err);
+    console.error('Error in POST /api/cities:', err);
     return NextResponse.json({ 
       error: 'Database error', 
       details: err instanceof Error ? err.message : String(err)
