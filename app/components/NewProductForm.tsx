@@ -106,18 +106,31 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
     setError(null);
     try {
       // Save all locations to /api/cities
-      await Promise.all(
-        locations.map(async (city) => {
-          console.log('POST city to /api/cities:', city);
+      console.log('Starting to save cities:', locations);
+      for (const city of locations) {
+        try {
+          console.log('Attempting to save city:', city);
           const res = await fetch('/api/cities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: city }),
           });
+          
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Error saving city:', city, errorData);
+            throw new Error(`Failed to save city ${city}: ${errorData.error || res.statusText}`);
+          }
+          
           const data = await res.json();
-          console.log('POST /api/cities response:', data);
-        })
-      );
+          console.log('Successfully saved city:', data);
+        } catch (err) {
+          console.error('Error in city save loop:', err);
+          throw err; // Re-throw to be caught by outer try-catch
+        }
+      }
+      console.log('All cities saved successfully');
+
       const formData = new FormData();
       formData.append('language', language);
       formData.append('category', category);

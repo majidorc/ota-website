@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
 
     // Check if city exists
     const exists = await pool.query('SELECT id FROM cities WHERE LOWER(name) = $1', [name.toLowerCase()]);
+    console.log('City exists check result:', exists.rows);
+    
     if (exists.rows.length > 0) {
       console.log('City already exists:', exists.rows[0]);
       return NextResponse.json({ id: exists.rows[0].id, name, country });
@@ -46,6 +48,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(insert.rows[0]);
   } catch (err) {
     console.error('Error adding city:', err);
-    return NextResponse.json({ error: 'Database error', details: err }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Database error', 
+      details: err instanceof Error ? err.message : String(err)
+    }, { status: 500 });
   }
 } 
