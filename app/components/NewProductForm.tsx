@@ -13,6 +13,21 @@ const categories = [
   { label: "Other", description: "Like a cooking class or multiple activities sold together" },
 ];
 
+type OptionType = {
+  title: string;
+  name: string;
+  referencecode: string;
+  groupsize: string;
+  languages: string[];
+  isprivate: boolean;
+  accessible: boolean;
+  status: string;
+  bookingengine: string;
+  cutofftime: string;
+  type: string;
+  description?: string;
+};
+
 export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [step, setStep] = useState<number>(1);
   const [language, setLanguage] = useState<string>("");
@@ -275,7 +290,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
           ) : (
             <OptionForm
               initialData={optionSubStep.data}
-              onSave={opt => {
+              onSave={(opt: OptionType) => {
                 const optionObj = {
                   ...opt,
                   name: opt.title || opt.name || '',
