@@ -115,7 +115,7 @@ export default function ManageProducts() {
                   </td>
                   <td>
                     <Link
-                      href={`/tours/${product.id}`}
+                      href={`/tours/${product.title.toLowerCase().replace(/\s+/g, '-')}-${product.id}`}
                       className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 mr-2"
                       target="_blank"
                     >
