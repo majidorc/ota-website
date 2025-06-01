@@ -435,6 +435,7 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
   const [loading, setLoading] = React.useState(false);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (input.length < 2) {
@@ -442,15 +443,21 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       return;
     }
     setLoading(true);
+    setError(null);
     console.log('Fetching city suggestions for:', input);
     fetch(`/api/cities?query=${encodeURIComponent(input)}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch suggestions');
+        return res.json();
+      })
       .then(data => {
         setSuggestions(data.map((c: any) => c.name));
         setLoading(false);
         console.log('City suggestions:', data);
       })
-      .catch(() => {
+      .catch(err => {
+        console.error('Error fetching suggestions:', err);
+        setError('Failed to load suggestions. Please try again.');
         setSuggestions([]);
         setLoading(false);
       });
@@ -463,12 +470,21 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       setLocations([...locations, city]);
       // Save city to DB if not already present
       try {
-        await fetch('/api/cities', {
+        const res = await fetch('/api/cities', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: city }),
         });
-      } catch {}
+        if (!res.ok) throw new Error('Failed to save city');
+        const data = await res.json();
+        console.log('City saved:', data);
+        setSuccess(`Added ${city} to locations`);
+        setTimeout(() => setSuccess(null), 3000);
+      } catch (err) {
+        console.error('Error saving city:', err);
+        setError(`Failed to save ${city}. Please try again.`);
+        setTimeout(() => setError(null), 3000);
+      }
     }
   };
 
@@ -480,12 +496,21 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
     setShowDropdown(false);
     // Save city to DB
     try {
-      await fetch('/api/cities', {
+      const res = await fetch('/api/cities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: city }),
       });
-    } catch {}
+      if (!res.ok) throw new Error('Failed to save city');
+      const data = await res.json();
+      console.log('City saved:', data);
+      setSuccess(`Added ${city} to locations`);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('Error saving city:', err);
+      setError(`Failed to save ${city}. Please try again.`);
+      setTimeout(() => setError(null), 3000);
+    }
   };
 
   return (
@@ -498,11 +523,13 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
         onChange={e => {
           setInput(e.target.value);
           setShowDropdown(true);
+          setError(null);
         }}
         onFocus={() => setShowDropdown(true)}
         onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
         onKeyDown={e => {
           if (e.key === 'Enter') {
+            e.preventDefault();
             handleAdd();
           }
         }}
@@ -522,6 +549,7 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       )}
       {loading && <div className="text-xs text-gray-400 mt-1">Loading...</div>}
       {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
+      {success && <div className="text-xs text-green-600 mt-1">{success}</div>}
     </div>
   );
 } 
