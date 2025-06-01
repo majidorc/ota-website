@@ -105,6 +105,16 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
     setLoading(true);
     setError(null);
     try {
+      // Save all locations to /api/cities
+      await Promise.all(
+        locations.map(async (city) => {
+          await fetch('/api/cities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: city }),
+          });
+        })
+      );
       const formData = new FormData();
       formData.append('language', language);
       formData.append('category', category);
