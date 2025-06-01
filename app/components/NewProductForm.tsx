@@ -318,7 +318,8 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   );
 }
 
-function OptionForm({ initialData, onSave, onCancel }: OptionFormProps) {
+function OptionForm(props: OptionFormProps) {
+  const { initialData, onSave, onCancel } = props;
   const [title, setTitle] = useState(initialData?.title || '');
   const [referencecode, setReferencecode] = useState(initialData?.referencecode || '');
   const [groupsize, setGroupsize] = useState(initialData?.groupsize || '');
