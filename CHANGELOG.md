@@ -17,6 +17,15 @@
 - Fixed: referencecode column type is now VARCHAR to support LIKE queries.
 - Standardized: All references to reference code now use lowercase `referencecode` for consistency across components and API endpoints.
 
+## [1.2.0] - 2024-06-02
+- Home page product grid and dynamic product detail page with SEO-friendly URLs.
+- Product options display on detail page.
+- Admin product edit stepper form for editing all fields.
+- Consistent use of lowercase `referencecode` in backend and frontend.
+- SQL fixes for `LIKE` operator compatibility.
+- PATCH handler for product updates by ID.
+- Continuous GitHub updates and deployment troubleshooting.
+
 ## [Earlier]
 - Initial project setup with Next.js, Neon Postgres, and admin dashboard.
 

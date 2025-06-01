@@ -140,3 +140,13 @@ The public product detail page (`app/tours/[slug]/page.tsx`) has been redesigned
 - **Placeholders** for itinerary/map and related products
 
 To customize the layout or add new features, edit `app/tours/[slug]/page.tsx` and adjust the Tailwind CSS classes as needed. 
+
+## v1.2.0 Updates
+- Home page now displays all products in a responsive grid.
+- Clicking a product opens a detail page at `/tours/[title-of-product]-[id]`.
+- Product detail page shows all product options/items.
+- Admin product edit page uses a multi-step sidebar stepper, allowing editing of all fields.
+- All references to `referencecode` are lowercase for database and API consistency.
+- SQL compatibility fixes for LIKE operator on `referencecode`.
+- PATCH handler added for `/api/products/[id]`.
+- See [CHANGELOG.md](./CHANGELOG.md) for details. 
