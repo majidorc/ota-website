@@ -124,10 +124,21 @@ export default function ManageProducts() {
                       className="text-red-600 hover:underline"
                       onClick={async () => {
                         if (confirm('Are you sure you want to delete this product?')) {
-                          const res = await fetch(`/api/products/${product.id}`, { method: 'DELETE' });
-                          if (res.ok) {
-                            setProducts(products.filter(p => p.id !== product.id));
-                          } else {
+                          try {
+                            const res = await fetch('/api/products', {
+                              method: 'DELETE',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ id: product.id }),
+                            });
+                            if (res.ok) {
+                              setProducts(products.filter(p => p.id !== product.id));
+                            } else {
+                              const error = await res.json();
+                              alert(error.error || 'Failed to delete product');
+                            }
+                          } catch (err) {
                             alert('Failed to delete product');
                           }
                         }
