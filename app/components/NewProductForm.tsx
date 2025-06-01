@@ -34,6 +34,12 @@ type OptionFormProps = {
   onCancel: () => void;
 };
 
+interface City {
+  id: number;
+  name: string;
+  country: string | null;
+}
+
 export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [step, setStep] = useState<number>(1);
   const [language, setLanguage] = useState<string>("");
@@ -47,7 +53,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [highlights, setHighlights] = useState<string[]>([]);
   const [highlightInput, setHighlightInput] = useState<string>("");
   const [highlightError, setHighlightError] = useState<string>("");
-  const [locations, setLocations] = useState<string[]>([]);
+  const [locations, setLocations] = useState<City[]>([]);
   const [locationInput, setLocationInput] = useState<string>("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState<string>("");
@@ -113,13 +119,13 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
           const res = await fetch('/api/cities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: city }),
+            body: JSON.stringify({ name: city.name }),
           });
           
           if (!res.ok) {
             const errorData = await res.json();
-            console.error('Error saving city:', city, errorData);
-            throw new Error(`Failed to save city ${city}: ${errorData.error || res.statusText}`);
+            console.error('Error saving city:', city.name, errorData);
+            throw new Error(`Failed to save city ${city.name}: ${errorData.error || res.statusText}`);
           }
           
           const data = await res.json();
@@ -139,7 +145,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       formData.append('shortDesc', shortDesc);
       formData.append('fullDesc', fullDesc);
       formData.append('highlights', JSON.stringify(highlights));
-      formData.append('locations', JSON.stringify(locations));
+      formData.append('locations', JSON.stringify(locations.map(l => l.name)));
       formData.append('keywords', JSON.stringify(keywords));
       formData.append('inclusions', inclusionsText);
       formData.append('exclusions', exclusionsText);
@@ -274,7 +280,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
           <div className="flex flex-wrap gap-2 mb-2">
             {locations.map((l, i) => (
               <span key={i} className="bg-green-100 text-green-800 px-2 py-1 rounded flex items-center">
-                {l}
+                {l.name}{l.country ? `, ${l.country}` : ''}
                 <button className="ml-1 text-xs" onClick={() => setLocations(locations.filter((_, idx) => idx !== i))}>×</button>
               </span>
             ))}
@@ -442,9 +448,9 @@ function OptionForm(props: OptionFormProps) {
   );
 }
 
-function CityAutocomplete({ locations, setLocations }: { locations: string[]; setLocations: (l: string[]) => void }) {
+function CityAutocomplete({ locations, setLocations }: { locations: City[]; setLocations: (l: City[]) => void }) {
   const [input, setInput] = React.useState("");
-  const [suggestions, setSuggestions] = React.useState<string[]>([]);
+  const [suggestions, setSuggestions] = React.useState<City[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -464,7 +470,7 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
         return res.json();
       })
       .then(data => {
-        setSuggestions(data.map((c: any) => c.name));
+        setSuggestions(data);
         setLoading(false);
         console.log('City suggestions:', data);
       })
@@ -476,52 +482,41 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       });
   }, [input]);
 
-  const handleSelect = async (city: string) => {
+  const handleSelect = async (city: City) => {
     setInput("");
     setShowDropdown(false);
-    if (!locations.includes(city)) {
+    if (!locations.some(l => l.id === city.id)) {
       setLocations([...locations, city]);
-      // Save city to DB if not already present
-      try {
-        const res = await fetch('/api/cities', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: city }),
-        });
-        if (!res.ok) throw new Error('Failed to save city');
-        const data = await res.json();
-        console.log('City saved:', data);
-        setSuccess(`Added ${city} to locations`);
-        setTimeout(() => setSuccess(null), 3000);
-      } catch (err) {
-        console.error('Error saving city:', err);
-        setError(`Failed to save ${city}. Please try again.`);
-        setTimeout(() => setError(null), 3000);
-      }
+      setSuccess(`Added ${city.name} to locations`);
+      setTimeout(() => setSuccess(null), 3000);
     }
   };
 
   const handleAdd = async () => {
-    const city = input.trim();
-    if (!city || locations.includes(city)) return;
-    setLocations([...locations, city]);
-    setInput("");
-    setShowDropdown(false);
-    // Save city to DB
+    const cityName = input.trim();
+    if (!cityName || locations.some(l => l.name.toLowerCase() === cityName.toLowerCase())) return;
+    
     try {
       const res = await fetch('/api/cities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: city }),
+        body: JSON.stringify({ name: cityName }),
       });
-      if (!res.ok) throw new Error('Failed to save city');
-      const data = await res.json();
-      console.log('City saved:', data);
-      setSuccess(`Added ${city} to locations`);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to save city');
+      }
+      
+      const newCity = await res.json();
+      setLocations([...locations, newCity]);
+      setInput("");
+      setShowDropdown(false);
+      setSuccess(`Added ${newCity.name} to locations`);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error saving city:', err);
-      setError(`Failed to save ${city}. Please try again.`);
+      setError(`Failed to save ${cityName}. Please try again.`);
       setTimeout(() => setError(null), 3000);
     }
   };
@@ -549,13 +544,13 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       />
       {showDropdown && suggestions.length > 0 && (
         <ul className="absolute z-10 bg-white border rounded w-full mt-1 max-h-48 overflow-y-auto shadow-lg">
-          {suggestions.map((city, idx) => (
+          {suggestions.map((city) => (
             <li
-              key={city + idx}
+              key={city.id}
               className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
               onMouseDown={() => handleSelect(city)}
             >
-              {city}
+              {city.name}{city.country ? `, ${city.country}` : ''}
             </li>
           ))}
         </ul>
@@ -563,6 +558,19 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       {loading && <div className="text-xs text-gray-400 mt-1">Loading...</div>}
       {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
       {success && <div className="text-xs text-green-600 mt-1">{success}</div>}
+      <div className="flex flex-wrap gap-2 mt-2">
+        {locations.map((city) => (
+          <span key={city.id} className="bg-green-100 text-green-800 px-2 py-1 rounded flex items-center">
+            {city.name}{city.country ? `, ${city.country}` : ''}
+            <button 
+              className="ml-1 text-xs hover:text-red-600" 
+              onClick={() => setLocations(locations.filter(l => l.id !== city.id))}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
     </div>
   );
 } 
