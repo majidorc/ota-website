@@ -1,11 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+// Ensure cities table exists
+async function ensureCitiesTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS cities (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        country VARCHAR(255),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      
+      CREATE INDEX IF NOT EXISTS cities_name_idx ON cities (LOWER(name));
+    `);
+  } catch (err) {
+    console.error('Error ensuring cities table:', err);
+    throw err;
+  }
+}
+
 // GET /api/cities?query=bang
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const query = searchParams.get('query') || '';
   try {
+    await ensureCitiesTable();
+    const { searchParams } = new URL(req.url);
+    const query = searchParams.get('query') || '';
     console.log('Searching cities with query:', query);
     const dbRes = await pool.query(
       'SELECT id, name, country FROM cities WHERE LOWER(name) LIKE $1 ORDER BY name LIMIT 10',
@@ -22,6 +43,7 @@ export async function GET(req: NextRequest) {
 // POST /api/cities { name, country }
 export async function POST(req: NextRequest) {
   try {
+    await ensureCitiesTable();
     const { name, country } = await req.json();
     console.log('Adding city:', { name, country });
     
