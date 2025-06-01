@@ -1,5 +1,53 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+## [1.2.0] - 2024-03-19
+
+### Added
+- SEO-friendly URLs for product detail pages (`/tours/[title]-[id]`)
+- View Details button in admin product list
+- Improved product list UI with status indicators
+- Enhanced error handling for product operations
+
+### Changed
+- Updated product view links to use SEO-friendly format
+- Improved button styling in admin interface
+- Enhanced product list layout and responsiveness
+
+### Fixed
+- Product view links now correctly point to `/tours/` instead of `/product/`
+- Improved error handling in product deletion
+- Fixed status display in product list
+
+## [1.1.0] - 2024-03-18
+
+### Added
+- Multi-step product creation form (15 steps)
+- Product management (CRUD operations)
+- Admin dashboard with product list
+- Neon Postgres integration
+- Modern UI with Tailwind CSS
+
+### Changed
+- Switched product ID to date-based string format (YYMMDD01)
+- Made reference code optional and editable
+- Updated product creation API to generate IDs automatically
+
+### Fixed
+- SQL compatibility for LIKE operator on referencecode
+- Standardized lowercase referencecode across components
+- Fixed product edit page with multi-step sidebar stepper
+
+## [1.0.0] - 2024-03-17
+
+### Added
+- Initial release
+- Basic product management
+- Database integration
+- Admin interface
+- Product creation workflow
+
 ## [1.0.0] - 2024-05-31
 - First stable release with all admin features and product management.
 - Refactor: Removed duplicate New Product forms. Only the form accessible via Admin → Create → New Product remains.
