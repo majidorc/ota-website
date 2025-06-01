@@ -163,6 +163,7 @@ export async function POST(request: Request) {
     if (!insertSuccess) {
       throw new Error('Failed to generate unique product ID after multiple attempts');
     }
+    if (!result) throw new Error('Product creation failed unexpectedly');
     return NextResponse.json({ id: result.rows[0].id });
   } catch (error) {
     console.error('Error creating product:', error);
