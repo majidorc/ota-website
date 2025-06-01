@@ -126,3 +126,16 @@ MIT
 
 ## Database Migration
 - Run `migrations/003_change_product_id_to_string.sql` manually on your database to apply the new ID format. 
+
+## Product Detail Page Redesign
+
+The public product detail page (`app/tours/[slug]/page.tsx`) has been redesigned to match the modern GetYourGuide style:
+
+- **Hero section** with a large main image and vertical photo gallery
+- **Sticky sidebar** with price, date/participant selector, and prominent booking button
+- **Info cards** for highlights, description, includes/excludes, meeting point, important info, and not available for
+- **Modern icons** and improved typography
+- **Responsive layout** for mobile and desktop
+- **Placeholders** for itinerary/map and related products
+
+To customize the layout or add new features, edit `app/tours/[slug]/page.tsx` and adjust the Tailwind CSS classes as needed. 
