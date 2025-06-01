@@ -17,13 +17,14 @@ See [CHANGELOG.md](./CHANGELOG.md) for all major changes.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React, TailwindCSS
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL (Neon)
-- **ORM**: Prisma
-- **Authentication**: NextAuth.js
-- **AI**: OpenAI GPT-3.5
-- **Deployment**: Vercel
+- **Frontend:** Next.js 14, React, Tailwind CSS, next/image
+- **Backend:** Next.js API Routes
+- **Database:** PostgreSQL (Neon)
+- **ORM:** Prisma
+- **Authentication:** NextAuth.js
+- **AI:** OpenAI GPT-3.5 (for product autofill)
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
 
 ## Getting Started
 
