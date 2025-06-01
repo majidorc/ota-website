@@ -151,7 +151,7 @@ export async function POST(request: Request) {
         insertSuccess = true;
       } catch (error) {
         // If duplicate key error, increment counter and try again
-        if (error && error.code === '23505' && String(error.detail).includes('Key (id)=')) {
+        if (error && (error as any).code === '23505' && String((error as any).detail).includes('Key (id)=')) {
           idCounter++;
           id = `${prefix}${String(idCounter).padStart(2, '0')}`;
           attempt++;
