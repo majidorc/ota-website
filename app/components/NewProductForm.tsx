@@ -111,6 +111,13 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
     setLoading(true);
     setError(null);
     try {
+      // Validate required fields
+      if (!title || title.trim() === '') {
+        setError('Product title is required');
+        setLoading(false);
+        return;
+      }
+
       // Save all locations to /api/cities
       console.log('Starting to save cities:', locations);
       const savedCities = [];
@@ -146,7 +153,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       const formData = new FormData();
       formData.append('language', language);
       formData.append('category', category);
-      formData.append('title', title);
+      formData.append('title', title.trim());
       formData.append('referenceCode', referenceCode);
       formData.append('shortDesc', shortDesc);
       formData.append('fullDesc', fullDesc);

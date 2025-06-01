@@ -54,6 +54,15 @@ export async function POST(request: Request) {
     const language = formData.get('language') as string;
     const category = formData.get('category') as string;
     const title = formData.get('title') as string;
+
+    // Validate required fields
+    if (!title || title.trim() === '') {
+      return NextResponse.json(
+        { error: 'Product title is required' },
+        { status: 400 }
+      );
+    }
+
     let referencecode = formData.get('referencecode') as string;
     if (!referencecode) {
       // Generate reference code: YYMMDD01, YYMMDD02, etc.
