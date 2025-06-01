@@ -160,8 +160,8 @@ Activity Description:
     suggestions.priceRange,
     suggestions.accessibility,
     suggestions.groupSize
-  ].filter(Boolean);
-  const highlights = rawHighlights.map(h => {
+  ].filter((h): h is string => typeof h === 'string' && !!h);
+  const highlights = rawHighlights.map((h: string) => {
     if (h.length >= 50) return h;
     // Pad with a descriptive phrase if too short
     return h + ' - ' + 'This is a key feature of the experience, providing more value and detail.';
