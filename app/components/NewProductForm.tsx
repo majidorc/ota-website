@@ -243,7 +243,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
                 {options.map((option, index) => (
                   <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
                     <div className="text-left">
-                      <div className="font-semibold">{option.title || option.name}</div>
+                      <div className="font-semibold">{option.name}</div>
                       <div className="text-sm text-gray-600">Ref: {option.referenceCode || option.referencecode || '-'}</div>
                       <div className="text-xs text-gray-400">Group size: {option.groupSize || '-'}, Type: {option.isPrivate ? 'Private' : 'Non-private'}</div>
                     </div>
