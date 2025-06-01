@@ -108,11 +108,14 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       // Save all locations to /api/cities
       await Promise.all(
         locations.map(async (city) => {
-          await fetch('/api/cities', {
+          console.log('POST city to /api/cities:', city);
+          const res = await fetch('/api/cities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: city }),
           });
+          const data = await res.json();
+          console.log('POST /api/cities response:', data);
         })
       );
       const formData = new FormData();
@@ -439,11 +442,13 @@ function CityAutocomplete({ locations, setLocations }: { locations: string[]; se
       return;
     }
     setLoading(true);
+    console.log('Fetching city suggestions for:', input);
     fetch(`/api/cities?query=${encodeURIComponent(input)}`)
       .then(res => res.json())
       .then(data => {
         setSuggestions(data.map((c: any) => c.name));
         setLoading(false);
+        console.log('City suggestions:', data);
       })
       .catch(() => {
         setSuggestions([]);
