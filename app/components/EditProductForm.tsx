@@ -38,6 +38,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [optionName, setOptionName] = useState("");
   const [optionDesc, setOptionDesc] = useState("");
+  const [highlightError, setHighlightError] = useState<string>("");
   const router = useRouter();
 
   const steps = [
@@ -206,11 +207,16 @@ export default function EditProductForm({ productId }: { productId: string }) {
             <input
               type="text"
               className="w-full border rounded px-3 py-2 mb-2"
-              placeholder="Add highlight and press Enter"
+              placeholder="Add highlight (at least 50 characters) and press Enter"
               onKeyDown={e => {
                 if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  if (e.currentTarget.value.trim().length < 50) {
+                    setHighlightError('Each highlight must be at least 50 characters.');
+                    return;
+                  }
                   setHighlights([...highlights, e.currentTarget.value.trim()]);
                   e.currentTarget.value = '';
+                  setHighlightError("");
                 }
               }}
             />
@@ -221,6 +227,19 @@ export default function EditProductForm({ productId }: { productId: string }) {
                   <button className="ml-1 text-xs" onClick={() => setHighlights(highlights.filter((_, idx) => idx !== i))}>×</button>
                 </span>
               ))}
+            </div>
+            {highlightError && <div className="text-red-600 text-sm mb-2">{highlightError}</div>}
+            <div className="flex justify-between mt-6">
+              <button
+                className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(3)}
+              >Back</button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+                onClick={() => setStep(5)}
+                disabled={highlights.some(h => h.length < 50)}
+                title={highlights.some(h => h.length < 50) ? 'All highlights must be at least 50 characters.' : ''}
+              >Continue</button>
             </div>
           </div>
         )}

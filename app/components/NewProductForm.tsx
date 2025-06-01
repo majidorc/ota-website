@@ -25,6 +25,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [fullDesc, setFullDesc] = useState<string>("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [highlightInput, setHighlightInput] = useState<string>("");
+  const [highlightError, setHighlightError] = useState<string>("");
   const [locations, setLocations] = useState<string[]>([]);
   const [locationInput, setLocationInput] = useState<string>("");
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -148,6 +149,72 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       )}
       {/* Sidebar */}
       {/* ... rest of the component remains unchanged ... */}
+      {step === 5 && (
+        <div>
+          {/* ...existing Descriptions UI... */}
+          <label className="block font-semibold mb-2">Highlights</label>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              className="flex-1 border rounded px-3 py-2"
+              value={highlightInput}
+              onChange={(e) => {
+                setHighlightInput(e.target.value);
+                if (e.target.value.length >= 50) setHighlightError("");
+              }}
+              placeholder="Enter highlight (at least 50 characters)"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && highlightInput.trim()) {
+                  if (highlightInput.trim().length < 50) {
+                    setHighlightError("Each highlight must be at least 50 characters.");
+                    return;
+                  }
+                  setHighlights([...highlights, highlightInput.trim()]);
+                  setHighlightInput('');
+                  setHighlightError("");
+                }
+              }}
+            />
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+              onClick={() => {
+                if (highlightInput.trim().length < 50) {
+                  setHighlightError("Each highlight must be at least 50 characters.");
+                  return;
+                }
+                setHighlights([...highlights, highlightInput.trim()]);
+                setHighlightInput('');
+                setHighlightError("");
+              }}
+            >Add</button>
+          </div>
+          {highlightError && <div className="text-red-600 text-sm mb-2">{highlightError}</div>}
+          <div className="space-y-2">
+            {highlights.map((highlight, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span className="flex-1">{highlight}</span>
+                <button
+                  className="text-red-600"
+                  onClick={() => setHighlights(highlights.filter((_, i) => i !== index))}
+                >Remove</button>
+              </div>
+            ))}
+          </div>
+          {/* Prevent continue if any highlight is too short */}
+          <div className="flex justify-between mt-6">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(4)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(6)}
+              disabled={highlights.some(h => h.length < 50)}
+              title={highlights.some(h => h.length < 50) ? 'All highlights must be at least 50 characters.' : ''}
+            >Continue</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
