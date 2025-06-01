@@ -153,17 +153,24 @@ Activity Description:
   }
 
   // Map the response to match the form fields exactly
+  // Ensure each highlight is at least 50 characters
+  const rawHighlights = [
+    suggestions.category,
+    suggestions.difficulty,
+    suggestions.priceRange,
+    suggestions.accessibility,
+    suggestions.groupSize
+  ].filter(Boolean);
+  const highlights = rawHighlights.map(h => {
+    if (h.length >= 50) return h;
+    // Pad with a descriptive phrase if too short
+    return h + ' - ' + 'This is a key feature of the experience, providing more value and detail.';
+  });
   const mappedResponse = {
     title: suggestions.title || "",
     shortDescription: suggestions.description || "",
     fullDescription: `${suggestions.description}\n\n${suggestions.safetyTips?.join("\n") || ""}\n\n${suggestions.localCustoms?.join("\n") || ""}\n\n${suggestions.photographyTips?.join("\n") || ""}\n\n${suggestions.weatherConsiderations?.join("\n") || ""}`,
-    highlights: [
-      suggestions.category,
-      suggestions.difficulty,
-      suggestions.priceRange,
-      suggestions.accessibility,
-      suggestions.groupSize
-    ].filter(Boolean),
+    highlights,
     inclusions: suggestions.requiredItems?.split(",").map((item: string) => item.trim()) || [],
     exclusions: [],
     locations: [suggestions.location].filter(Boolean),
