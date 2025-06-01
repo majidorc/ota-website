@@ -26,12 +26,14 @@ async function ensureCitiesTable() {
 
 // GET /api/cities?query=bang
 export async function GET(req: NextRequest) {
+  const client = await pool.connect();
   try {
     await ensureCitiesTable();
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('query') || '';
     console.log('Searching cities with query:', query);
-    const dbRes = await pool.query(
+    
+    const dbRes = await client.query(
       'SELECT id, name, country FROM cities WHERE LOWER(name) LIKE $1 ORDER BY name LIMIT 10',
       [`%${query.toLowerCase()}%`]
     );
@@ -40,14 +42,16 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error('Error searching cities:', err);
     return NextResponse.json({ error: 'Database error', details: err }, { status: 500 });
+  } finally {
+    client.release();
   }
 }
 
 // POST /api/cities { name, country }
 export async function POST(req: NextRequest) {
+  const client = await pool.connect();
   try {
     console.log('Starting POST request to /api/cities');
-    await ensureCitiesTable();
     
     const body = await req.json();
     console.log('Received request body:', body);
@@ -60,29 +64,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'City name required' }, { status: 400 });
     }
 
+    // Start transaction
+    await client.query('BEGIN');
+
     // Check if city exists
     console.log('Checking if city exists:', name);
-    const exists = await pool.query('SELECT id FROM cities WHERE LOWER(name) = $1', [name.toLowerCase()]);
+    const exists = await client.query(
+      'SELECT id, name, country FROM cities WHERE LOWER(name) = $1',
+      [name.toLowerCase()]
+    );
     console.log('City exists check result:', exists.rows);
     
     if (exists.rows.length > 0) {
       console.log('City already exists:', exists.rows[0]);
-      return NextResponse.json({ id: exists.rows[0].id, name, country });
+      await client.query('COMMIT');
+      return NextResponse.json(exists.rows[0]);
     }
 
     // Insert new city
     console.log('Attempting to insert new city:', { name, country });
-    const insert = await pool.query(
+    const insert = await client.query(
       'INSERT INTO cities (name, country) VALUES ($1, $2) RETURNING id, name, country',
       [name, country || null]
     );
     console.log('Successfully inserted city:', insert.rows[0]);
+
+    await client.query('COMMIT');
     return NextResponse.json(insert.rows[0]);
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('Error in POST /api/cities:', err);
     return NextResponse.json({ 
       error: 'Database error', 
       details: err instanceof Error ? err.message : String(err)
     }, { status: 500 });
+  } finally {
+    client.release();
   }
 } 
