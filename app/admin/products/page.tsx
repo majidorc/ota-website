@@ -127,6 +127,12 @@ export default function ManageProducts() {
                     >
                       Edit
                     </Link>
+                    <Link
+                      href={`/admin/products/${product.id}`}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 mr-2"
+                    >
+                      View Details
+                    </Link>
                     <button
                       className="text-red-600 hover:underline"
                       onClick={async () => {
