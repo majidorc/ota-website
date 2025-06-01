@@ -244,8 +244,8 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
                   <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
                     <div className="text-left">
                       <div className="font-semibold">{option.name}</div>
-                      <div className="text-sm text-gray-600">Ref: {(option as any).referenceCode || (option as any).referencecode || '-'}</div>
-                      <div className="text-xs text-gray-400">Group size: {option.groupSize || '-'}, Type: {option.isPrivate ? 'Private' : 'Non-private'}</div>
+                      <div className="text-sm text-gray-600">Ref: {(option as any).referencecode || '-'}</div>
+                      <div className="text-xs text-gray-400">Group size: {(option as any).groupsize || '-'}, Type: {(option as any).isprivate ? 'Private' : 'Non-private'}</div>
                     </div>
                     <button
                       className="border border-blue-600 text-blue-600 px-4 py-1 rounded font-semibold ml-4"
@@ -299,14 +299,14 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
 
 function OptionForm({ initialData, onSave, onCancel }) {
   const [title, setTitle] = useState(initialData?.title || '');
-  const [referenceCode, setReferenceCode] = useState(initialData?.referenceCode || '');
-  const [groupSize, setGroupSize] = useState(initialData?.groupSize || '');
+  const [referencecode, setReferencecode] = useState(initialData?.referencecode || '');
+  const [groupsize, setGroupsize] = useState(initialData?.groupsize || '');
   const [languages, setLanguages] = useState(initialData?.languages || []);
-  const [isPrivate, setIsPrivate] = useState(initialData?.isPrivate || false);
+  const [isprivate, setIsprivate] = useState(initialData?.isprivate || false);
   const [accessible, setAccessible] = useState(initialData?.accessible || false);
   const [status, setStatus] = useState(initialData?.status || 'Temporary');
-  const [bookingEngine, setBookingEngine] = useState(initialData?.bookingEngine || 'Automatically accept new bookings');
-  const [cutoffTime, setCutoffTime] = useState(initialData?.cutoffTime || '');
+  const [bookingengine, setBookingengine] = useState(initialData?.bookingengine || 'Automatically accept new bookings');
+  const [cutofftime, setCutofftime] = useState(initialData?.cutofftime || '');
   const [type, setType] = useState(initialData?.type || 'Non-private');
 
   return (
@@ -318,11 +318,11 @@ function OptionForm({ initialData, onSave, onCancel }) {
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Reference code</label>
-        <input className="w-full border rounded px-3 py-2" value={referenceCode} onChange={e => setReferenceCode(e.target.value)} />
+        <input className="w-full border rounded px-3 py-2" value={referencecode} onChange={e => setReferencecode(e.target.value)} />
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Maximum group size</label>
-        <input className="w-full border rounded px-3 py-2" type="number" value={groupSize} onChange={e => setGroupSize(e.target.value)} />
+        <input className="w-full border rounded px-3 py-2" type="number" value={groupsize} onChange={e => setGroupsize(e.target.value)} />
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Languages</label>
@@ -331,8 +331,8 @@ function OptionForm({ initialData, onSave, onCancel }) {
       <div className="mb-4">
         <label className="block font-semibold mb-1">Is this a private activity?</label>
         <div className="flex gap-4 mt-1">
-          <label><input type="radio" checked={!isPrivate} onChange={() => setIsPrivate(false)} /> No</label>
-          <label><input type="radio" checked={isPrivate} onChange={() => setIsPrivate(true)} /> Yes</label>
+          <label><input type="radio" checked={!isprivate} onChange={() => setIsprivate(false)} /> No</label>
+          <label><input type="radio" checked={isprivate} onChange={() => setIsprivate(true)} /> Yes</label>
         </div>
       </div>
       <div className="mb-4">
@@ -348,11 +348,11 @@ function OptionForm({ initialData, onSave, onCancel }) {
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Booking Engine</label>
-        <input className="w-full border rounded px-3 py-2" value={bookingEngine} onChange={e => setBookingEngine(e.target.value)} />
+        <input className="w-full border rounded px-3 py-2" value={bookingengine} onChange={e => setBookingengine(e.target.value)} />
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Cut-off time</label>
-        <input className="w-full border rounded px-3 py-2" value={cutoffTime} onChange={e => setCutoffTime(e.target.value)} />
+        <input className="w-full border rounded px-3 py-2" value={cutofftime} onChange={e => setCutofftime(e.target.value)} />
       </div>
       <div className="mb-4">
         <label className="block font-semibold mb-1">Type</label>
@@ -360,7 +360,7 @@ function OptionForm({ initialData, onSave, onCancel }) {
       </div>
       <div className="flex justify-between mt-6">
         <button type="button" className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold" onClick={onCancel}>Cancel</button>
-        <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => onSave({ title, referenceCode, groupSize, languages, isPrivate, accessible, status, bookingEngine, cutoffTime, type })}>Save</button>
+        <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => onSave({ title, name: title, referencecode, groupsize, languages, isprivate, accessible, status, bookingengine, cutofftime, type })}>Save</button>
       </div>
     </form>
   );
