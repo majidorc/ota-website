@@ -238,6 +238,34 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       )}
+      {step === 6 && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Locations</h2>
+          <CityAutocomplete
+            locations={locations}
+            setLocations={setLocations}
+          />
+          <div className="flex flex-wrap gap-2 mb-2">
+            {locations.map((l, i) => (
+              <span key={i} className="bg-green-100 text-green-800 px-2 py-1 rounded flex items-center">
+                {l}
+                <button className="ml-1 text-xs" onClick={() => setLocations(locations.filter((_, idx) => idx !== i))}>×</button>
+              </span>
+            ))}
+          </div>
+          <div className="flex justify-between mt-6">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(5)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(7)}
+              disabled={locations.length === 0}
+            >Continue</button>
+          </div>
+        </div>
+      )}
       {/* Step 10: Options */}
       {step === 10 && (
         <div className="max-w-xl mx-auto flex flex-col items-center text-center">
@@ -385,5 +413,100 @@ function OptionForm(props: OptionFormProps) {
         <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded font-semibold" onClick={() => onSave({ title, name: title, referencecode, groupsize, languages, isprivate, accessible, status, bookingengine, cutofftime, type })}>Save</button>
       </div>
     </form>
+  );
+}
+
+function CityAutocomplete({ locations, setLocations }: { locations: string[]; setLocations: (l: string[]) => void }) {
+  const [input, setInput] = React.useState("");
+  const [suggestions, setSuggestions] = React.useState<string[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [showDropdown, setShowDropdown] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (input.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    setLoading(true);
+    fetch(`/api/cities?query=${encodeURIComponent(input)}`)
+      .then(res => res.json())
+      .then(data => {
+        setSuggestions(data.map((c: any) => c.name));
+        setLoading(false);
+      })
+      .catch(() => {
+        setSuggestions([]);
+        setLoading(false);
+      });
+  }, [input]);
+
+  const handleSelect = async (city: string) => {
+    setInput("");
+    setShowDropdown(false);
+    if (!locations.includes(city)) {
+      setLocations([...locations, city]);
+      // Save city to DB if not already present
+      try {
+        await fetch('/api/cities', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: city }),
+        });
+      } catch {}
+    }
+  };
+
+  const handleAdd = async () => {
+    const city = input.trim();
+    if (!city || locations.includes(city)) return;
+    setLocations([...locations, city]);
+    setInput("");
+    setShowDropdown(false);
+    // Save city to DB
+    try {
+      await fetch('/api/cities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: city }),
+      });
+    } catch {}
+  };
+
+  return (
+    <div className="relative mb-2">
+      <input
+        type="text"
+        className="w-full border rounded px-3 py-2"
+        placeholder="Type city name..."
+        value={input}
+        onChange={e => {
+          setInput(e.target.value);
+          setShowDropdown(true);
+        }}
+        onFocus={() => setShowDropdown(true)}
+        onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            handleAdd();
+          }
+        }}
+      />
+      {showDropdown && suggestions.length > 0 && (
+        <ul className="absolute z-10 bg-white border rounded w-full mt-1 max-h-48 overflow-y-auto shadow-lg">
+          {suggestions.map((city, idx) => (
+            <li
+              key={city + idx}
+              className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+              onMouseDown={() => handleSelect(city)}
+            >
+              {city}
+            </li>
+          ))}
+        </ul>
+      )}
+      {loading && <div className="text-xs text-gray-400 mt-1">Loading...</div>}
+      {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
+    </div>
   );
 } 
