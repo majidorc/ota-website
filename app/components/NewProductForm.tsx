@@ -45,6 +45,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [loadingChatGPT, setLoadingChatGPT] = useState(false);
   const [chatGPTError, setChatGPTError] = useState<string | null>(null);
+  const [showOptionForm, setShowOptionForm] = useState(false);
   const router = useRouter();
 
   const steps = [
@@ -211,6 +212,101 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
               onClick={() => setStep(6)}
               disabled={highlights.some(h => h.length < 50)}
               title={highlights.some(h => h.length < 50) ? 'All highlights must be at least 50 characters.' : ''}
+            >Continue</button>
+          </div>
+        </div>
+      )}
+      {/* Step 10: Options */}
+      {step === 10 && (
+        <div className="max-w-xl mx-auto flex flex-col items-center text-center">
+          <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 justify-center">
+            Add option(s) to your product
+            <span title="Options allow you to customize your activity and attract more customers.">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16v-4m0-4h.01" /></svg>
+            </span>
+          </h2>
+          <p className="mb-4 text-gray-700">Options allow you to customize your activity and attract more customers. For example, your options can have different:</p>
+          <ul className="text-left mb-4 text-gray-700 list-disc list-inside mx-auto max-w-md">
+            <li>Durations (1 or 2 hours)</li>
+            <li>Group sizes (10 or 20 people) or set-ups (private or public)</li>
+            <li>Languages (English or Spanish)</li>
+            <li>Inclusions (with or without lunch)</li>
+            <li>Ways to start the activity (meeting point or hotel pickup)</li>
+          </ul>
+          <p className="mb-6 text-gray-700 text-sm">The option is where the pricing/availability are stored, and where bookings are made. So you need at least one option per product to start receiving bookings.</p>
+          {/* Create new option button and form */}
+          <div className="mb-6">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold hover:bg-blue-50 transition mb-4"
+              onClick={() => setShowOptionForm(true)}
+              type="button"
+            >Create new option</button>
+            {showOptionForm && (
+              <div className="flex flex-col md:flex-row gap-2 items-center justify-center mb-2">
+                <input
+                  type="text"
+                  className="flex-1 border rounded px-3 py-2"
+                  value={optionName}
+                  onChange={(e) => setOptionName(e.target.value)}
+                  placeholder="Option name (e.g. 2-hour tour, Private group)"
+                />
+                <input
+                  type="text"
+                  className="flex-1 border rounded px-3 py-2"
+                  value={optionDesc}
+                  onChange={(e) => setOptionDesc(e.target.value)}
+                  placeholder="Option description (optional)"
+                />
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded font-semibold"
+                  onClick={() => {
+                    if (optionName.trim()) {
+                      setOptions([...options, { name: optionName.trim(), description: optionDesc.trim() }]);
+                      setOptionName('');
+                      setOptionDesc('');
+                      setShowOptionForm(false);
+                    }
+                  }}
+                  type="button"
+                >Add</button>
+                <button
+                  className="text-gray-500 hover:text-red-600 ml-2"
+                  onClick={() => {
+                    setShowOptionForm(false);
+                    setOptionName('');
+                    setOptionDesc('');
+                  }}
+                  type="button"
+                >Cancel</button>
+              </div>
+            )}
+          </div>
+          {/* List of added options */}
+          <div className="w-full max-w-md mx-auto mb-6">
+            {options.length === 0 && <div className="text-gray-400 italic">No options added yet.</div>}
+            {options.map((option, index) => (
+              <div key={index} className="flex items-center justify-between bg-gray-50 border rounded p-4 mb-2">
+                <div className="text-left">
+                  <div className="font-semibold">{option.name}</div>
+                  {option.description && <div className="text-sm text-gray-600">{option.description}</div>}
+                </div>
+                <button
+                  className="text-red-600 font-semibold ml-4"
+                  onClick={() => setOptions(options.filter((_, i) => i !== index))}
+                  type="button"
+                >Remove</button>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-6 w-full max-w-md mx-auto">
+            <button
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(9)}
+            >Back</button>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded font-semibold"
+              onClick={() => setStep(11)}
+              disabled={options.length === 0}
             >Continue</button>
           </div>
         </div>
