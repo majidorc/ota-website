@@ -116,10 +116,25 @@ export default function ManageProducts() {
                   <td>
                     <Link
                       href={`/admin/products/${product.id}/edit`}
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 hover:underline mr-4"
                     >
                       Edit
                     </Link>
+                    <button
+                      className="text-red-600 hover:underline"
+                      onClick={async () => {
+                        if (confirm('Are you sure you want to delete this product?')) {
+                          const res = await fetch(`/api/products/${product.id}`, { method: 'DELETE' });
+                          if (res.ok) {
+                            setProducts(products.filter(p => p.id !== product.id));
+                          } else {
+                            alert('Failed to delete product');
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
