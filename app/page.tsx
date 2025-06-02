@@ -58,10 +58,25 @@ export default function Home() {
           <a href="#" className="text-blue-600 font-medium hover:underline ml-4">Become a supplier</a>
         </div>
         <div className="flex items-center gap-6">
-          <button title="Wishlist" className="text-gray-600 hover:text-blue-600"><span className="material-icons">favorite_border</span></button>
-          <button title="Cart" className="text-gray-600 hover:text-blue-600"><span className="material-icons">shopping_cart</span></button>
+          {/* Wishlist Icon */}
+          <button title="Wishlist" className="text-gray-600 hover:text-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.014-4.5-4.5-4.5-1.74 0-3.223 1.01-3.972 2.475C11.223 4.76 9.74 3.75 8 3.75 5.514 3.75 3.5 5.765 3.5 8.25c0 7.25 8.5 11 8.5 11s8.5-3.75 8.5-11z" />
+            </svg>
+          </button>
+          {/* Cart Icon */}
+          <button title="Cart" className="text-gray-600 hover:text-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0L7.5 15.75A2.25 2.25 0 009.664 18h4.672a2.25 2.25 0 002.164-2.25l1.394-10.477m-13.09 1.477h13.09" />
+            </svg>
+          </button>
           <button className="text-gray-600 hover:text-blue-600">EN/THB ฿</button>
-          <button className="text-gray-600 hover:text-blue-600"><span className="material-icons">person</span></button>
+          {/* Person Icon */}
+          <button className="text-gray-600 hover:text-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 1115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75v-.75z" />
+            </svg>
+          </button>
         </div>
       </nav>
       {/* Sub Navigation */}
