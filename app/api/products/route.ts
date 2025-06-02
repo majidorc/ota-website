@@ -201,7 +201,7 @@ export async function PATCH(req: NextRequest) {
     }
     values.push(data.id);
     const res = await pool.query<Product>(
-      `UPDATE "Product" SET ${fields.join(', ')}, "updatedAt" = NOW() WHERE id = $${idx} RETURNING *`,
+      `UPDATE product SET ${fields.join(', ')}, updatedat = NOW() WHERE id = $${idx} RETURNING *`,
       values
     );
     if (!res.rows[0]) {
@@ -221,7 +221,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
-    await pool.query('DELETE FROM "Product" WHERE id = $1', [id]);
+    await pool.query('DELETE FROM product WHERE id = $1', [id]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting product:', error);
