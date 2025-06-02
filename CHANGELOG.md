@@ -74,6 +74,24 @@ All notable changes to this project will be documented in this file.
 - PATCH handler for product updates by ID.
 - Continuous GitHub updates and deployment troubleshooting.
 
+## [1.3.0] - 2024-06-03
+### Added
+- Customer dashboard with bookings list and profile edit page
+- Supplier dashboard with real product count and quick links
+- Admin dashboard for managing suppliers and products
+- Profile edit page for customers
+- Fallback in bookings API for demo-user
+- Reusable HeaderButton component for header icons
+- All branding updated to 'OTA'
+
+### Changed
+- Header icons now use SVGs and a reusable function
+- Bookings API returns empty array for demo-user to prevent errors
+
+### Fixed
+- 404 and 500 errors on customer dashboard and profile edit page
+- Type errors and build issues for client/server components
+
 ## [Earlier]
 - Initial project setup with Next.js, Neon Postgres, and admin dashboard.
 
