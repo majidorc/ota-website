@@ -14,12 +14,38 @@ declare global {
 }
 
 interface Product {
-  id: number;
-  name: string;
-  description: string;
-  referenceCode: string;
-  status: "Bookable" | "Deactivated" | "In review";
+  id: string;
+  title: string;
+  status: "Pending" | "Approved" | "Rejected";
 }
+
+interface Supplier {
+  id: string;
+  name: string;
+  email: string;
+  products: Product[];
+}
+
+const mockSuppliers: Supplier[] = [
+  {
+    id: "1",
+    name: "Majid Travel",
+    email: "majid@example.com",
+    products: [
+      { id: "p1", title: "Bangkok City Tour", status: "Pending" },
+      { id: "p2", title: "Ayutthaya Day Trip", status: "Approved" },
+    ],
+  },
+  {
+    id: "2",
+    name: "Global Tours",
+    email: "global@example.com",
+    products: [
+      { id: "p3", title: "Chiang Mai Adventure", status: "Rejected" },
+      { id: "p4", title: "Phuket Beach Fun", status: "Pending" },
+    ],
+  },
+];
 
 const statusColors: Record<string, string> = {
   Bookable: "bg-green-100 text-green-800",
@@ -47,205 +73,104 @@ const categories = [
 ];
 
 export default function AdminDashboard() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const router = useRouter();
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/destinations")
-      .then((res) => res.json())
-      .then((data) => {
-        // Add mock referenceCode and status for demo
-        setProducts(
-          data.map((item: any, idx: number) => ({
-            ...item,
-            referenceCode: `REF${1000 + idx}`,
-            status: idx % 3 === 0 ? "Bookable" : idx % 3 === 1 ? "Deactivated" : "In review",
-          }))
-        );
-      });
-  }, []);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: Event) {
-      if (
-        openDropdown &&
-        dropdownRefs.current[openDropdown] &&
-        !dropdownRefs.current[openDropdown]?.contains(event.target as Node)
-      ) {
-        setOpenDropdown(null);
-      }
-    }
-    if (openDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openDropdown]);
-
-  const handleDropdownClick = (tabName: string) => {
-    setOpenDropdown(openDropdown === tabName ? null : tabName);
+  const handleApprove = (supplierId: string, productId: string) => {
+    setSuppliers(suppliers => suppliers.map(s =>
+      s.id === supplierId ? {
+        ...s,
+        products: s.products.map(p =>
+          p.id === productId ? { ...p, status: "Approved" } : p
+        )
+      } : s
+    ));
   };
 
-  const handleNavigation = (href: string) => {
-    setOpenDropdown(null);
-    setMobileMenuOpen(false);
-    router.push(href);
+  const handleReject = (supplierId: string, productId: string) => {
+    setSuppliers(suppliers => suppliers.map(s =>
+      s.id === supplierId ? {
+        ...s,
+        products: s.products.map(p =>
+          p.id === productId ? { ...p, status: "Rejected" } : p
+        )
+      } : s
+    ));
+  };
+
+  const handleDelete = (supplierId: string, productId: string) => {
+    setSuppliers(suppliers => suppliers.map(s =>
+      s.id === supplierId ? {
+        ...s,
+        products: s.products.filter(p => p.id !== productId)
+      } : s
+    ));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gray-50 p-8 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">Admin: Manage Suppliers & Products</h1>
+      {suppliers.map(supplier => (
+        <div key={supplier.id} className="mb-8 bg-white rounded shadow p-6">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <div className="font-bold text-lg">{supplier.name}</div>
+              <div className="text-gray-500 text-sm">{supplier.email}</div>
+            </div>
+            <span className="text-xs text-gray-400">Supplier ID: {supplier.id}</span>
           </div>
-
-          {/* Top Navigation Bar */}
-          <nav className="flex flex-col md:flex-row md:items-center md:justify-between bg-white px-4 md:px-8 py-4 shadow-sm border-b gap-4 md:gap-0 relative">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 w-full md:w-auto">
-              <span className="font-bold text-lg md:text-xl text-blue-600">Admin Panel</span>
-              {/* Hamburger for mobile */}
-              <button
-                className="md:hidden absolute right-4 top-4 z-30"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Open menu"
-              >
-                <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-blue-600">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              {/* Desktop nav */}
-              <div className="hidden md:flex items-center gap-8">
-                {menuTabs.map((tab) => (
-                  <div
-                    key={tab.name}
-                    className="relative"
-                    ref={(el: HTMLDivElement | null) => { dropdownRefs.current[tab.name] = el; }}
-                  >
-                    {tab.dropdown ? (
-                      <button
-                        className="text-gray-700 font-medium hover:text-blue-600 focus:outline-none px-2 py-1"
-                        onClick={() => handleDropdownClick(tab.name)}
-                      >
-                        {tab.name}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleNavigation(tab.href || '#')}
-                        className="text-gray-700 font-medium hover:text-blue-600 px-2 py-1"
-                      >
-                        {tab.name}
-                      </button>
-                    )}
-                    {tab.dropdown && openDropdown === tab.name && (
-                      <div className="absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
-                        {tab.dropdown.map((item) => (
-                          <button
-                            key={item.label}
-                            onClick={() => handleNavigation(item.href || '#')}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
-              <div className="flex items-center gap-2 justify-center md:justify-start">
-                <span className="font-semibold text-gray-700">Majid</span>
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">M</div>
-              </div>
-            </div>
-          </nav>
-
-          {/* Mobile menu */}
-          {mobileMenuOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-30 z-20 md:hidden">
-              <div className="absolute top-0 left-0 w-64 h-full bg-white shadow-lg p-6" onClick={e => e.stopPropagation()}>
-                <button className="mb-6" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
-                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <nav className="flex flex-col gap-4">
-                  {menuTabs.map((tab) => (
-                    <div key={tab.name}>
-                      {tab.dropdown ? (
-                        <>
-                          <div className="font-semibold text-gray-900">{tab.name}</div>
-                          <div className="ml-4 mt-1 flex flex-col gap-1">
-                            {tab.dropdown.map((item) => (
-                              <button
-                                key={item.label}
-                                onClick={() => handleNavigation(item.href || '#')}
-                                className="text-sm text-gray-600 hover:text-blue-600 text-left"
-                              >
-                                {item.label}
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => handleNavigation(tab.href || '#')}
-                          className="text-gray-700 font-medium hover:text-blue-600"
-                        >
-                          {tab.name}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </nav>
-              </div>
-            </div>
-          )}
-
-          {/* Main Content */}
-          <div className="mt-8">
-            <h1 className="text-2xl font-bold mb-6">Products</h1>
-            <div className="overflow-x-auto bg-white rounded shadow">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference code</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {products.map((product) => (
-                    <tr key={product.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                        <div className="text-sm text-gray-500">{product.description}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.referenceCode}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[product.status]}`}>{product.status}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button className="text-blue-600 hover:underline font-semibold">See details</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <table className="w-full table-auto border-collapse mt-4">
+            <thead>
+              <tr className="bg-gray-100 text-left">
+                <th className="p-3">Product</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {supplier.products.map(product => (
+                <tr key={product.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 font-semibold">{product.title}</td>
+                  <td className="py-3">
+                    <span className={
+                      product.status === "Approved"
+                        ? "bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium"
+                        : product.status === "Rejected"
+                        ? "bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium"
+                        : "bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium"
+                    }>
+                      {product.status}
+                    </span>
+                  </td>
+                  <td className="py-3 flex gap-2">
+                    <button
+                      className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                      disabled={product.status === "Approved"}
+                      onClick={() => handleApprove(supplier.id, product.id)}
+                    >Approve</button>
+                    <button
+                      className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                      disabled={product.status === "Rejected"}
+                      onClick={() => handleReject(supplier.id, product.id)}
+                    >Reject</button>
+                    <Link
+                      href={`/supplier/products/${product.id}/edit`}
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                    >Edit</Link>
+                    <button
+                      className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400"
+                      onClick={() => handleDelete(supplier.id, product.id)}
+                    >Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      ))}
     </div>
   );
 } 
