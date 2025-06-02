@@ -3,15 +3,25 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function CustomerDashboard() {
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Replace with your real API endpoint
-    fetch("/api/bookings")
+    fetch("/api/bookings?userId=demo-user")
       .then(res => res.json())
-      .then(data => setBookings(data))
-      .catch(() => setBookings([]))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setBookings(data);
+        } else {
+          setBookings([]);
+          setError(data.error || "Failed to load bookings");
+        }
+      })
+      .catch(() => {
+        setBookings([]);
+        setError("Failed to load bookings");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -22,6 +32,8 @@ export default function CustomerDashboard() {
         <h2 className="text-xl font-semibold mb-4">Upcoming Bookings</h2>
         {loading ? (
           <div>Loading...</div>
+        ) : error ? (
+          <div className="text-red-600">{error}</div>
         ) : bookings.length === 0 ? (
           <div>No upcoming bookings.</div>
         ) : (
