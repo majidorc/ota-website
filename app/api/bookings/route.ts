@@ -69,6 +69,10 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
+    // Fallback for demo/testing: if userId is 'demo-user', return empty array
+    if (userId === 'demo-user') {
+      return NextResponse.json([]);
+    }
     // Fetch bookings with activity (with images) and schedule
     const bookingsRes = await pool.query<Booking & Activity & Schedule>(
       `SELECT b.*, a.*, s.*, b.id as bookingId FROM "Booking" b
