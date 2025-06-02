@@ -47,7 +47,7 @@ export default function Home() {
       {/* Top Navigation Bar */}
       <nav className="flex items-center justify-between px-8 py-4 border-b bg-white sticky top-0 z-20">
         <div className="flex items-center gap-8">
-          <span className="font-bold text-xl text-orange-600 tracking-tight">GET<br className="md:hidden"/>YOUR<br className="md:hidden"/>GUIDE</span>
+          <span className="font-bold text-xl text-orange-600 tracking-tight">OTA</span>
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
             <input className="bg-transparent outline-none px-2 py-1 w-48" placeholder="Find places and things to do" />
             <select className="bg-transparent outline-none text-gray-600">
@@ -229,10 +229,10 @@ const searchResults = [
   { id: 3, image: '/images/jungle.jpg', type: 'DAY TRIP', title: 'Ko Samui: 4WD Wild Jungle Safari Tour with Lunch', duration: '7-7.5 hours', group: 'Small group', price: '฿1,700' },
 ]
 const experiences = [
-  { id: 1, image: '/images/palau.jpg', badge: 'Originals by GetYourGuide', type: 'WATER ACTIVITY', title: 'From Palau: La Maddalena Catamaran Tour w/ Lunch', duration: '7 hours', group: 'Small group', price: '฿4,850' },
-  { id: 2, image: '/images/portland.jpg', badge: 'Originals by GetYourGuide', type: 'WATER ACTIVITY', title: 'Portland: Best of Maine Lighthouse Scenic Cruise', duration: '105 minutes', group: 'Small group', price: '฿1,759' },
-  { id: 3, image: '/images/lanzarote.jpg', badge: 'Originals by GetYourGuide', type: 'ADVENTURE', title: 'Lanzarote: Guided Off-Road Volcano Buggy Tour', duration: '2-3 hours', group: 'Pickup available', price: '฿4,815' },
-  { id: 4, image: '/images/split.jpg', badge: 'Originals by GetYourGuide', type: 'WATER ACTIVITY', title: 'Split/Trogir: Blue Cave, Hvar and 5 Island Tour', duration: '10-11 hours', group: 'Small group', price: '฿3,277' },
+  { id: 1, image: '/images/palau.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'From Palau: La Maddalena Catamaran Tour w/ Lunch', duration: '7 hours', group: 'Small group', price: '฿4,850' },
+  { id: 2, image: '/images/portland.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'Portland: Best of Maine Lighthouse Scenic Cruise', duration: '105 minutes', group: 'Small group', price: '฿1,759' },
+  { id: 3, image: '/images/lanzarote.jpg', badge: 'Originals by OTA', type: 'ADVENTURE', title: 'Lanzarote: Guided Off-Road Volcano Buggy Tour', duration: '2-3 hours', group: 'Pickup available', price: '฿4,815' },
+  { id: 4, image: '/images/split.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'Split/Trogir: Blue Cave, Hvar and 5 Island Tour', duration: '10-11 hours', group: 'Small group', price: '฿3,277' },
 ]
 const destinations = [
   { id: 1, name: 'Rome', image: '/images/rome.jpg' },

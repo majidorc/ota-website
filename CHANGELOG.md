@@ -82,7 +82,7 @@ All notable changes to this project will be documented in this file.
 - Product ID is now a string in the format YYMMDD01 (date-based, unique, not editable) and used as the primary key for new products.
 - Reference code is now optional, editable, and not unique.
 - Added migration to change the id column type in the Product table.
-- Product creation API now generates the new ID format automatically.
+- Product creation API now generates the new ID format automatically. 
 - All product database fields are now lowercase (e.g. shortdesc, fulldesc, meetingpoint, importantinfo) for SQL and code consistency.
 - Product creation and edit APIs now properly parse and stringify JSON fields (highlights, locations, keywords, options).
 - Product creation API now retries with the next counter if a duplicate product ID is detected, ensuring unique IDs even with concurrent creation.
@@ -93,7 +93,7 @@ All notable changes to this project will be documented in this file.
 - General bugfixes and codebase cleanup for full lowercase SQL and robust product management.
 
 ### Added
-- Redesigned public product detail page to match GetYourGuide style:
+- Redesigned public product detail page to match OTA style:
   - Hero section with large main image and vertical gallery
   - Sticky sidebar with price, date/participant selector, and booking button
   - Info cards for highlights, description, includes/excludes, meeting point, important info, and not available for
