@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import SearchBar from './SearchBar'
 
 const destinations = [
   { name: 'Europe', href: '/destinations/europe', items: [
@@ -51,6 +52,11 @@ export default function Navbar() {
             <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold text-blue-600">
               OTA
             </Link>
+          </div>
+          <div className="hidden lg:flex flex-1 justify-center">
+            <div className="w-full max-w-xl">
+              <SearchBar />
+            </div>
           </div>
           <div className="flex lg:hidden">
             <button
