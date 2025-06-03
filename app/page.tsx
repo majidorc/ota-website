@@ -231,4 +231,17 @@ export default function Home() {
                       <div className="text-xs text-gray-600 mb-2">{product.shortDesc}</div>
                       <div className="text-xs text-gray-500">
                         From <span className="font-bold">
-                          {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}`
+                          {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}` : 'Contact for price'}
+                        </span> per person
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
