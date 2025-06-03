@@ -48,27 +48,15 @@ export default function Navbar() {
     <header className="bg-white shadow-sm">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Global">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex lg:flex-1">
+          <div className="flex items-center gap-6 lg:gap-8 flex-shrink-0">
             <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold text-blue-600">
               OTA
             </Link>
-          </div>
-          <div className="hidden lg:flex flex-1 justify-center">
-            <div className="w-full max-w-xl">
+            <div className="hidden lg:block w-80">
               <SearchBar />
             </div>
           </div>
-          <div className="flex lg:hidden">
-            <button
-              type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="hidden lg:flex lg:gap-x-8">
+          <div className="hidden lg:flex lg:gap-x-8 flex-1 justify-center">
             {navigation.map((item) => (
               <div key={item.name} className="relative">
                 {item.items ? (
@@ -110,19 +98,23 @@ export default function Navbar() {
               </div>
             ))}
           </div>
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-6">
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <Link
               href="/login"
-              className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600"
+              className="btn-primary text-sm font-semibold leading-6 px-5 py-2 rounded-full"
             >
-              Log in
+              Log in / Sign up
             </Link>
-            <Link
-              href="/signup"
-              className="btn-primary text-sm font-semibold leading-6"
+          </div>
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              onClick={() => setMobileMenuOpen(true)}
             >
-              Sign up
-            </Link>
+              <span className="sr-only">Open main menu</span>
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </nav>
