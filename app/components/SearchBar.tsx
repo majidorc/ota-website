@@ -8,11 +8,10 @@ export default function SearchBar() {
   const [date, setDate] = useState('')
 
   const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement navigation to search results page or update parent state
-    // For now, just log the search
-    console.log('Searching for:', { location, date })
-    // Example: window.location.href = `/search?location=${encodeURIComponent(location)}&date=${encodeURIComponent(date)}`
+    e.preventDefault();
+    if (location.trim()) {
+      window.location.href = `/search?query=${encodeURIComponent(location)}`;
+    }
   }
 
   return (
