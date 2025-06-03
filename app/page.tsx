@@ -77,9 +77,9 @@ export default function Home() {
         <SearchBar />
       </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center bg-gray-200 overflow-hidden">
-        <Image src="/images/hero.jpg" alt="Hero" fill className="object-cover object-center z-0" />
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
+        <Image src="/images/header-bg.svg" alt="Header background" fill className="object-cover object-center z-0" priority />
+        <div className="absolute inset-0 bg-black/30 z-10" />
         <div className="relative z-20 flex flex-col items-center justify-center h-full w-full">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center drop-shadow-lg">Find your next travel experience</h1>
           <a href="#" className="text-white underline font-semibold">Learn more &gt;</a>
