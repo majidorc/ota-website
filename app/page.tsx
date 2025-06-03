@@ -73,6 +73,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white font-sans">
       <Navbar />
+      <div className="flex justify-center py-6 bg-white">
+        <SearchBar />
+      </div>
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] flex items-center justify-center bg-gray-200 overflow-hidden">
         <Image src="/images/hero.jpg" alt="Hero" fill className="object-cover object-center z-0" />
