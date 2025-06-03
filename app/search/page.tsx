@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 
@@ -14,6 +15,13 @@ interface Product {
   badge?: string;
   rating?: number;
   reviewCount?: number;
+}
+
+function toKebabCase(str: string) {
+  return str && str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 }
 
 function SearchResults() {
@@ -51,9 +59,14 @@ function SearchResults() {
         <div className="text-gray-400">No results found.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products.map(product => {
+            const slug = `${toKebabCase(product.title || 'product')}-${product.id}`;
+            return (
+              <Link key={product.id} href={`/tours/${slug}`} className="block">
+                <ProductCard product={product} />
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
