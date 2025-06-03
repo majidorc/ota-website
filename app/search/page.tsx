@@ -1,8 +1,8 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Navbar from "../components/Navbar";
+import ProductCard from "../components/ProductCard";
 
 interface Product {
   id: string;
@@ -10,6 +10,10 @@ interface Product {
   description?: string;
   price?: number;
   image?: string;
+  category?: string;
+  badge?: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
 function SearchResults() {
@@ -48,23 +52,7 @@ function SearchResults() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map(product => (
-            <div key={product.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-              <div className="relative h-40 w-full">
-                <Image 
-                  src={product.image || '/images/placeholder.jpg'} 
-                  alt={product.title} 
-                  fill 
-                  className="object-cover rounded-t-lg" 
-                />
-              </div>
-              <div className="p-4">
-                <div className="font-semibold mb-1">{product.title}</div>
-                <div className="text-xs text-gray-600 mb-2">{product.description}</div>
-                <div className="text-xs text-gray-500">
-                  {typeof product.price === 'number' ? `From ${product.price.toFixed(2)} per person` : 'Contact for price'}
-                </div>
-              </div>
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
