@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Navbar from "../components/Navbar";
 
 interface Product {
   id: string;
@@ -73,8 +74,11 @@ function SearchResults() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SearchResults />
-    </Suspense>
+    <>
+      <Navbar />
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchResults />
+      </Suspense>
+    </>
   );
 } 
