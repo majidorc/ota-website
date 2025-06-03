@@ -64,6 +64,11 @@ export default function Home() {
       <nav className="flex items-center justify-between px-8 py-4 border-b bg-white sticky top-0 z-20">
         <div className="flex items-center gap-8">
           <span className="font-bold text-xl text-orange-600 tracking-tight">OTA</span>
+          <form onSubmit={e => { e.preventDefault(); /* TODO: handle search */ }} className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
+            <input className="bg-transparent outline-none px-2 py-1 w-48" placeholder="Find places and things to do" />
+            <input type="date" className="bg-transparent outline-none text-gray-600 px-2 py-1 w-32" />
+            <button className="bg-blue-600 text-white px-4 py-1 rounded ml-2 font-semibold">Search</button>
+          </form>
           <a href="#" className="text-blue-600 font-medium hover:underline ml-4">Become a supplier</a>
         </div>
         <div className="flex items-center gap-6">
@@ -111,10 +116,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* SearchBar below hero */}
-      <div className="py-8 px-4 md:px-16">
-        <SearchBar />
-      </div>
       {/* Continue Planning */}
       <section className="py-10 px-4 md:px-16">
         <h2 className="text-2xl font-bold mb-6">Continue planning</h2>
