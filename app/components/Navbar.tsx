@@ -48,15 +48,15 @@ export default function Navbar() {
     <header className="bg-white shadow-sm">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="Global">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6 lg:gap-8 flex-shrink-0">
+          <div className="flex items-center gap-4 flex-shrink-0">
             <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold text-blue-600">
               OTA
             </Link>
-            <div className="hidden lg:block w-80">
+            <div className="hidden lg:block w-64 flex-shrink-0">
               <SearchBar />
             </div>
           </div>
-          <div className="hidden lg:flex lg:gap-x-8 flex-1 justify-center">
+          <div className="hidden lg:flex flex-1 justify-center ml-8">
             {navigation.map((item) => (
               <div key={item.name} className="relative">
                 {item.items ? (
