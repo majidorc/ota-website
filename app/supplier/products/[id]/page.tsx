@@ -66,7 +66,7 @@ const mockOptions = [
 ];
 
 const mockHistory: HistoryItem[] = [
-  // Example: { date: '2024-05-01', status: 'Active', section: 'Title', before: 'Old', after: 'New', editor: 'Admin' }
+  // Example: { date: '2024-05-01', status: 'Active', section: 'Title', before: 'Old', after: 'New', editor: 'Supplier' }
 ];
 
 function classNames(...classes: string[]) {
@@ -191,7 +191,7 @@ export default function ProductDetails({ params }: { params: { id: string } }) {
               <div className="font-bold mb-1">Long description</div>
               <div className="mb-4 whitespace-pre-line">{product.longdesc}</div>
             </div>
-            <Link href={`/admin/products/${product.id}/edit`} className="ml-6 bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 h-10">Edit product</Link>
+            <Link href={`/supplier/products/${product.id}/edit`} className="ml-6 bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 h-10">Edit product</Link>
           </div>
         </div>
 

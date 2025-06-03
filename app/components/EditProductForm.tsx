@@ -105,7 +105,7 @@ export default function EditProductForm({ productId }: { productId: string }) {
         }),
       });
       if (!res.ok) throw new Error("Failed to update product");
-      router.push(`/admin/products/${productId}`);
+      router.push(`/supplier/products/${productId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

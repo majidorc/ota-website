@@ -48,7 +48,7 @@ export default function NewActivity() {
       }
 
       const activity = await response.json();
-      router.push(`/admin/activities/${activity.id}`);
+      router.push(`/supplier/activities/${activity.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

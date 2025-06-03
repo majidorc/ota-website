@@ -52,7 +52,7 @@ export default function ManageProducts() {
       <div className="w-full max-w-6xl bg-white rounded shadow p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <h1 className="text-3xl font-bold">Products</h1>
-          <Link href="/admin/products/new" className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">+ Create new product</Link>
+          <Link href="/supplier/products/new" className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">+ Create new product</Link>
         </div>
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
@@ -122,13 +122,13 @@ export default function ManageProducts() {
                       View
                     </Link>
                     <Link
-                      href={`/admin/products/${product.id}/edit`}
+                      href={`/supplier/products/${product.id}/edit`}
                       className="text-blue-600 hover:underline mr-4"
                     >
                       Edit
                     </Link>
                     <Link
-                      href={`/admin/products/${product.id}`}
+                      href={`/supplier/products/${product.id}`}
                       className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 mr-2"
                     >
                       View Details

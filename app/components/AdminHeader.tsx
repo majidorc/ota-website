@@ -3,14 +3,14 @@ import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const menuTabs = [
-  { name: "Create", dropdown: [{ label: "New Product", href: "/admin/products/new", internal: true }] },
-  { name: "Manage", dropdown: [{ label: "Products", href: "/admin/products", internal: true }] },
-  { name: "Bookings", dropdown: [{ label: "Bookings", href: "/admin/bookings", internal: true }] },
-  { name: "Performance", href: "/admin/performance", internal: true },
-  { name: "Finance", href: "/admin/finance", internal: true },
+  { name: "Create", dropdown: [{ label: "New Product", href: "/supplier/products/new", internal: true }] },
+  { name: "Manage", dropdown: [{ label: "Products", href: "/supplier/products", internal: true }] },
+  { name: "Bookings", dropdown: [{ label: "Bookings", href: "/supplier/bookings", internal: true }] },
+  { name: "Performance", href: "/supplier/performance", internal: true },
+  { name: "Finance", href: "/supplier/finance", internal: true },
 ];
 
-export default function AdminHeader() {
+export default function SupplierHeader() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function AdminHeader() {
   return (
     <nav className="flex flex-col md:flex-row md:items-center md:justify-between bg-white px-4 md:px-8 py-4 shadow-sm border-b gap-4 md:gap-0 relative">
       <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 w-full md:w-auto">
-        <span className="font-bold text-lg md:text-xl text-blue-600">Admin Panel</span>
+        <span className="font-bold text-lg md:text-xl text-blue-600">Supplier Panel</span>
         {/* Hamburger for mobile */}
         <button
           className="md:hidden absolute right-4 top-4 z-30"

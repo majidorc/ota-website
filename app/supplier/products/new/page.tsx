@@ -116,7 +116,7 @@ export default function NewProductForm() {
         throw new Error('Failed to create product');
       }
 
-      router.push('/admin/products');
+      router.push('/supplier/products');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

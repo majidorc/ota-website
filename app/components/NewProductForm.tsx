@@ -190,7 +190,7 @@ export default function NewProductForm({ onClose }: { onClose?: () => void }) {
       if (onClose) {
         onClose();
       } else {
-        router.push('/admin/products');
+        router.push('/supplier/products');
       }
     } catch (err) {
       console.error('Error in form submission:', err);
