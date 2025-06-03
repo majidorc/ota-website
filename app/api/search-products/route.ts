@@ -17,7 +17,7 @@ async function fetchLocalProducts(query: string) {
   // Search by title, description, or keywords (case-insensitive)
   const result = await pool.query(
     `SELECT * FROM product WHERE 
-      LOWER(title) LIKE $1 OR LOWER(shortdesc) LIKE $1 OR LOWER(description) LIKE $1 OR 
+      LOWER(title) LIKE $1 OR LOWER(shortdesc) LIKE $1 OR LOWER(fulldesc) LIKE $1 OR 
       (keywords IS NOT NULL AND keywords::text ILIKE $1)
       ORDER BY createdat DESC LIMIT 20`,
     [`%${query.toLowerCase()}%`]
