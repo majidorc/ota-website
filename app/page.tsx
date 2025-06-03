@@ -31,6 +31,11 @@ export default function Home() {
   const [continuePlanning, setContinuePlanning] = useState<any[]>([])
   const tabs = ['For you', 'Culture', 'Food', 'Nature']
 
+  // Add missing variables to fix build error
+  const searchResults: any[] = [];
+  const experiences: any[] = [];
+  const destinations: any[] = [];
+
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
