@@ -64,10 +64,18 @@ export default function Home() {
       <nav className="flex items-center justify-between px-8 py-4 border-b bg-white sticky top-0 z-20">
         <div className="flex items-center gap-8">
           <span className="font-bold text-xl text-orange-600 tracking-tight">OTA</span>
-          <form onSubmit={e => { e.preventDefault(); /* TODO: handle search */ }} className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-            <input className="bg-transparent outline-none px-2 py-1 w-48" placeholder="Find places and things to do" />
-            <input type="date" className="bg-transparent outline-none text-gray-600 px-2 py-1 w-32" />
-            <button className="bg-blue-600 text-white px-4 py-1 rounded ml-2 font-semibold">Search</button>
+          <form onSubmit={e => { e.preventDefault(); /* TODO: handle search */ }} className="flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-2 py-1 w-[480px] focus-within:ring-2 focus-within:ring-blue-100">
+            <span className="pl-3 pr-2 text-gray-400">
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z' /></svg>
+            </span>
+            <input className="bg-transparent outline-none px-2 py-2 w-48 text-gray-700 placeholder-gray-500 font-medium" placeholder="Find places and things to do" />
+            <span className="h-6 w-px bg-gray-200 mx-2" />
+            <button type="button" className="flex items-center gap-1 px-2 py-1 text-gray-600 font-medium hover:text-blue-600 focus:outline-none">
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z' /></svg>
+              <span className="font-semibold">Anytime</span>
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4 ml-1 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' /></svg>
+            </button>
+            <button type="submit" className="ml-3 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-300 transition">Search</button>
           </form>
           <a href="#" className="text-blue-600 font-medium hover:underline ml-4">Become a supplier</a>
         </div>
@@ -218,59 +226,4 @@ export default function Home() {
                       <div className="text-xs text-gray-600 mb-2">{product.shortDesc}</div>
                       <div className="text-xs text-gray-500">
                         From <span className="font-bold">
-                          {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}` : 'Contact for price'}
-                        </span> per person
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-      {/* Footer */}
-      <footer className="bg-gray-50 py-10 px-4 md:px-16 mt-10 border-t">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-xs text-gray-700">
-          {footerLinks.map((col, i) => (
-            <div key={i}>
-              <div className="font-bold mb-2">{col.title}</div>
-              <ul>
-                {col.links.map((link, j) => (
-                  <li key={j} className="mb-1">{link}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </footer>
-    </div>
-  )
-}
-
-const searchResults = [
-  { id: 1, image: '/images/angthong.jpg', type: 'WATER ACTIVITY', title: 'Koh Samui: Mu Ko Ang Thong Park Cruise w/ Kayaking Option', duration: '9 hours', group: 'Pickup available', price: '฿1,104' },
-  { id: 2, image: '/images/samui.jpg', type: 'WATER ACTIVITY', title: 'Samui: Angthong Marine Park Boat Tour w/ Transfer and Meals', duration: '8 hours', group: 'Pickup available', price: '฿1,300' },
-  { id: 3, image: '/images/jungle.jpg', type: 'DAY TRIP', title: 'Ko Samui: 4WD Wild Jungle Safari Tour with Lunch', duration: '7-7.5 hours', group: 'Small group', price: '฿1,700' },
-]
-const experiences = [
-  { id: 1, image: '/images/palau.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'From Palau: La Maddalena Catamaran Tour w/ Lunch', duration: '7 hours', group: 'Small group', price: '฿4,850' },
-  { id: 2, image: '/images/portland.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'Portland: Best of Maine Lighthouse Scenic Cruise', duration: '105 minutes', group: 'Small group', price: '฿1,759' },
-  { id: 3, image: '/images/lanzarote.jpg', badge: 'Originals by OTA', type: 'ADVENTURE', title: 'Lanzarote: Guided Off-Road Volcano Buggy Tour', duration: '2-3 hours', group: 'Pickup available', price: '฿4,815' },
-  { id: 4, image: '/images/split.jpg', badge: 'Originals by OTA', type: 'WATER ACTIVITY', title: 'Split/Trogir: Blue Cave, Hvar and 5 Island Tour', duration: '10-11 hours', group: 'Small group', price: '฿3,277' },
-]
-const destinations = [
-  { id: 1, name: 'Rome', image: '/images/rome.jpg' },
-  { id: 2, name: 'Paris', image: '/images/paris.jpg' },
-  { id: 3, name: 'London', image: '/images/london.jpg' },
-  { id: 4, name: 'New York City', image: '/images/nyc.jpg' },
-  { id: 5, name: 'Dubai', image: '/images/dubai.jpg' },
-  { id: 6, name: 'Barcelona', image: '/images/barcelona.jpg' },
-]
-const footerLinks = [
-  { title: 'Top attractions worldwide', links: ['Moulin Rouge', 'Seine River', 'Ha Long Bay', 'Notre Dame Cathedral', 'Miracle Garden', 'Memorial and Museum', 'Sagrada Familia', 'Disneyland Paris', 'Last Supper', 'Caminito del Rey'] },
-  { title: 'Top destinations', links: ['Vatican Museums', 'Louvre Museum', 'Keukenhof', 'Eiffel Tower', 'Colosseum', 'Alhambra', 'Warner Bros. Studio Tour', 'Van Gogh Museum', 'Niagara Falls', 'Machu Picchu'] },
-  { title: 'Top countries to visit', links: ['Palace of Versailles', 'Park Güell', 'Anne Frank House', 'Aquaventure Waterpark', 'Notre Dame Cathedral', 'Sagrada Familia', 'Disneyland Paris', 'Last Supper', 'Caminito del Rey', 'Vatican Museums'] },
-  { title: 'Top attraction categories', links: ['Eiffel Tower', 'Colosseum', 'Alhambra', 'Warner Bros. Studio Tour', 'Van Gogh Museum', 'Niagara Falls', 'Machu Picchu', 'Palace of Versailles', 'Park Güell', 'Anne Frank House'] },
-  { title: 'Top cities', links: ['Rome', 'Paris', 'London', 'New York City', 'Dubai', 'Barcelona', 'Bangkok', 'Singapore', 'Istanbul', 'Prague'] },
-] 
+                          {typeof product.price === 'number' ? `${product.price.toFixed(2)} ${product.currency || ''}`
