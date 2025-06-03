@@ -33,6 +33,8 @@ const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Destinations', href: '/destinations', items: destinations },
   { name: 'Experiences', href: '/experiences', items: experiences },
+  { name: 'Hotels', href: '/hotels' },
+  { name: 'Flights', href: '/flights' },
   { name: 'Deals', href: '/deals' },
   { name: 'About', href: '/about' },
 ]
