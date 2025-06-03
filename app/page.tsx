@@ -29,6 +29,7 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [continuePlanning, setContinuePlanning] = useState<any[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
   const tabs = ['For you', 'Culture', 'Food', 'Nature']
 
   // Add missing variables to fix build error
@@ -69,11 +70,16 @@ export default function Home() {
       <nav className="flex items-center justify-between px-8 py-4 border-b bg-white sticky top-0 z-20">
         <div className="flex items-center gap-8">
           <span className="font-bold text-xl text-orange-600 tracking-tight">OTA</span>
-          <form onSubmit={e => { e.preventDefault(); /* TODO: handle search */ }} className="flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-2 py-1 w-[480px] focus-within:ring-2 focus-within:ring-blue-100">
+          <form onSubmit={e => {
+            e.preventDefault();
+            if (searchQuery.trim()) {
+              window.location.href = `/search?query=${encodeURIComponent(searchQuery)}`;
+            }
+          }} className="flex items-center bg-white rounded-full border border-gray-200 shadow-sm px-2 py-1 w-[480px] focus-within:ring-2 focus-within:ring-blue-100">
             <span className="pl-3 pr-2 text-gray-400">
               <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z' /></svg>
             </span>
-            <input className="bg-transparent outline-none px-2 py-2 w-48 text-gray-700 placeholder-gray-500 font-medium" placeholder="Find places and things to do" />
+            <input className="bg-transparent outline-none px-2 py-2 w-48 text-gray-700 placeholder-gray-500 font-medium" placeholder="Find places and things to do" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             <span className="h-6 w-px bg-gray-200 mx-2" />
             <button type="button" className="flex items-center gap-1 px-2 py-1 text-gray-600 font-medium hover:text-blue-600 focus:outline-none">
               <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z' /></svg>
