@@ -28,6 +28,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('For you')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [continuePlanning, setContinuePlanning] = useState<any[]>([])
   const tabs = ['For you', 'Culture', 'Food', 'Nature']
 
   useEffect(() => {
@@ -41,6 +42,13 @@ export default function Home() {
         console.error('Failed to load products:', err)
         setLoading(false)
       })
+    // Continue planning: get last viewed product from localStorage
+    if (typeof window !== 'undefined') {
+      const lastProduct = localStorage.getItem('lastViewedProduct')
+      if (lastProduct) {
+        setContinuePlanning([JSON.parse(lastProduct)])
+      }
+    }
   }, [])
 
   function toKebabCase(str: string) {
@@ -56,13 +64,6 @@ export default function Home() {
       <nav className="flex items-center justify-between px-8 py-4 border-b bg-white sticky top-0 z-20">
         <div className="flex items-center gap-8">
           <span className="font-bold text-xl text-orange-600 tracking-tight">OTA</span>
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 py-1">
-            <input className="bg-transparent outline-none px-2 py-1 w-48" placeholder="Find places and things to do" />
-            <select className="bg-transparent outline-none text-gray-600">
-              <option>Anytime</option>
-            </select>
-            <button className="bg-blue-600 text-white px-4 py-1 rounded ml-2 font-semibold">Search</button>
-          </div>
           <a href="#" className="text-blue-600 font-medium hover:underline ml-4">Become a supplier</a>
         </div>
         <div className="flex items-center gap-6">
@@ -110,11 +111,15 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* SearchBar below hero */}
+      <div className="py-8 px-4 md:px-16">
+        <SearchBar />
+      </div>
       {/* Continue Planning */}
       <section className="py-10 px-4 md:px-16">
         <h2 className="text-2xl font-bold mb-6">Continue planning</h2>
         <div className="flex gap-6 overflow-x-auto pb-2">
-          {continuePlanning.map((item) => (
+          {continuePlanning.length > 0 ? continuePlanning.map((item) => (
             <div key={item.id} className="min-w-[260px] bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
               <div className="relative h-40 w-full">
                 <Image src={item.image} alt={item.title} fill className="object-cover rounded-t-lg" />
@@ -126,7 +131,9 @@ export default function Home() {
                 <div className="text-xs text-gray-500">From <span className="font-bold">{item.price}</span> per person</div>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="text-gray-500">No recent products. Start exploring to see suggestions here!</div>
+          )}
         </div>
       </section>
       {/* Based on your search */}
@@ -240,9 +247,6 @@ export default function Home() {
   )
 }
 
-const continuePlanning = [
-  { id: 1, image: '/images/palm.jpg', type: 'WATER ACTIVITY', title: 'Koh Samui: Koh Madsum, Koh Tan & Koh Rap by Longtail Boat', duration: '5 hours', group: 'Private group', price: '฿2,571' },
-]
 const searchResults = [
   { id: 1, image: '/images/angthong.jpg', type: 'WATER ACTIVITY', title: 'Koh Samui: Mu Ko Ang Thong Park Cruise w/ Kayaking Option', duration: '9 hours', group: 'Pickup available', price: '฿1,104' },
   { id: 2, image: '/images/samui.jpg', type: 'WATER ACTIVITY', title: 'Samui: Angthong Marine Park Boat Tour w/ Transfer and Meals', duration: '8 hours', group: 'Pickup available', price: '฿1,300' },
